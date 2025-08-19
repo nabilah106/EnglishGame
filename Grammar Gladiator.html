@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gladiator Grammar Arena</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%);
+            min-height: 100vh;
+            color: #2C1810;
+        }
+        
+        .arena {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #8B0000;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #654321;
+            font-weight: 600;
+        }
+        
+        .registration {
+            background: linear-gradient(145deg, #F5DEB3, #DEB887);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid #8B4513;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .registration h2 {
+            font-size: 2rem;
+            color: #8B0000;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2C1810;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #8B4513;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Cinzel', serif;
+            background: rgba(255,255,255,0.9);
+        }
+        
+        .start-btn {
+            background: linear-gradient(145deg, #8B0000, #A0522D);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cinzel', serif;
+            margin-top: 20px;
+        }
+        
+        .start-btn:hover {
+            background: linear-gradient(145deg, #A0522D, #8B0000);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .gladiator-panel {
+            background: linear-gradient(145deg, #DEB887, #D2B48C);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid #8B4513;
+        }
+        
+        .gladiator {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .gladiator-mascot {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 15px;
+            display: block;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid #8B4513;
+            background: linear-gradient(145deg, #DEB887, #D2B48C);
+        }
+        
+        .animated-gladiator {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            animation: gladiatorIdle 2s ease-in-out infinite;
+            transform-origin: center bottom;
+            background-image: url('https://img.freepik.com/premium-vector/pixel-art-trojan-spartan-roman-gladiator-warrior_1322560-44271.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: all 0.3s ease;
+        }
+        
+        .animated-gladiator.correct {
+            animation: gladiatorCheer 1s ease-in-out;
+            background-image: url('https://gifdb.com/images/high/gladiator-498-x-498-gif-bfgoiyf8rohvsagk.gif');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .animated-gladiator.incorrect {
+            animation: gladiatorHit 1s ease-in-out;
+            background-image: url('https://us.123rf.com/450wm/captainvector/captainvector2208/captainvector220828865/189848625-pixel-art-gaming-character.jpg?ver=6');
+        }
+        
+        .animated-gladiator.defeated {
+            animation: gladiatorDefeat 2s ease-in-out;
+            filter: grayscale(100%) brightness(0.5);
+        }
+        
+        @keyframes gladiatorIdle {
+            0%, 100% { 
+                transform: translateY(0px) scale(1);
+            }
+            50% { 
+                transform: translateY(-5px) scale(1.02);
+            }
+        }
+        
+        @keyframes gladiatorCheer {
+            0%, 100% { 
+                transform: scale(1) rotate(0deg);
+                filter: brightness(1);
+            }
+            25% { 
+                transform: scale(1.15) rotate(-3deg);
+                filter: brightness(1.3) saturate(1.2);
+            }
+            50% { 
+                transform: scale(1.2) rotate(3deg);
+                filter: brightness(1.5) saturate(1.4);
+            }
+            75% { 
+                transform: scale(1.1) rotate(-2deg);
+                filter: brightness(1.2) saturate(1.1);
+            }
+        }
+        
+        @keyframes gladiatorHit {
+            0% { 
+                transform: scale(1) rotate(0deg);
+                filter: brightness(1);
+            }
+            25% { 
+                transform: scale(0.9) rotate(-8deg);
+                filter: brightness(0.7) hue-rotate(320deg);
+            }
+            50% { 
+                transform: scale(0.85) rotate(8deg);
+                filter: brightness(0.5) hue-rotate(340deg);
+            }
+            75% { 
+                transform: scale(0.9) rotate(-4deg);
+                filter: brightness(0.6) hue-rotate(350deg);
+            }
+            100% { 
+                transform: scale(1) rotate(0deg);
+                filter: brightness(1) hue-rotate(0deg);
+            }
+        }
+        
+        @keyframes gladiatorDefeat {
+            0% { 
+                transform: scale(1) rotate(0deg);
+                filter: brightness(1);
+            }
+            50% { 
+                transform: scale(0.8) rotate(-30deg);
+                filter: grayscale(50%) brightness(0.7);
+            }
+            100% { 
+                transform: scale(0.7) rotate(-45deg);
+                filter: grayscale(100%) brightness(0.5);
+                opacity: 0.8;
+            }
+        }
+        
+        .student-info {
+            background: rgba(139, 69, 19, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #8B4513;
+        }
+        
+        .student-info h3 {
+            color: #8B0000;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .student-info p {
+            color: #654321;
+            font-size: 0.9rem;
+        }
+        
+        .gladiator-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #8B0000;
+            margin-bottom: 15px;
+        }
+        
+        .health-bar {
+            background: #654321;
+            height: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 2px solid #8B4513;
+        }
+        
+        .health-fill {
+            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .health-text {
+            text-align: center;
+            font-weight: 600;
+            color: #8B0000;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat {
+            background: rgba(139, 69, 19, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #8B4513;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #8B0000;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #654321;
+        }
+        
+        .question-panel {
+            background: linear-gradient(145deg, #F5DEB3, #DEB887);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid #8B4513;
+        }
+        
+        .question-counter {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #8B0000;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .question {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            color: #2C1810;
+            font-weight: 500;
+            line-height: 1.4;
+            text-transform: none;
+            font-family: 'Georgia', serif;
+        }
+        
+        .options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .option {
+            background: linear-gradient(145deg, #DEB887, #D2B48C);
+            border: 2px solid #8B4513;
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #2C1810;
+        }
+        
+        .option:hover {
+            background: linear-gradient(145deg, #F4A460, #DEB887);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .option.correct {
+            background: linear-gradient(145deg, #90EE90, #98FB98);
+            border-color: #228B22;
+            color: #006400;
+        }
+        
+        .option.incorrect {
+            background: linear-gradient(145deg, #FFB6C1, #FFA0B4);
+            border-color: #DC143C;
+            color: #8B0000;
+        }
+        
+        .feedback {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 20px 0;
+            min-height: 30px;
+        }
+        
+        .feedback.correct {
+            color: #228B22;
+        }
+        
+        .feedback.incorrect {
+            color: #DC143C;
+        }
+        
+        .next-btn {
+            background: linear-gradient(145deg, #8B0000, #A0522D);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .next-btn:hover {
+            background: linear-gradient(145deg, #A0522D, #8B0000);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .next-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .game-over {
+            text-align: center;
+            background: linear-gradient(145deg, #F5DEB3, #DEB887);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 3px solid #8B4513;
+        }
+        
+        .game-over h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #8B0000;
+        }
+        
+        .final-score {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #2C1810;
+        }
+        
+        .scoreboard-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(139, 69, 19, 0.1);
+            border-radius: 10px;
+            border: 2px solid #8B4513;
+        }
+        
+        .scoreboard-btn {
+            background: linear-gradient(145deg, #4169E1, #6495ED);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cinzel', serif;
+            margin: 10px;
+        }
+        
+        .scoreboard-btn:hover {
+            background: linear-gradient(145deg, #6495ED, #4169E1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .restart-btn {
+            background: linear-gradient(145deg, #228B22, #32CD32);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cinzel', serif;
+        }
+        
+        .restart-btn:hover {
+            background: linear-gradient(145deg, #32CD32, #228B22);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .gladiator-mascot {
+                font-size: 4rem;
+            }
+            
+            .scoreboard-table {
+                font-size: 0.9rem;
+            }
+            
+            .scoreboard-table th,
+            .scoreboard-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="arena">
+        <div class="header">
+            <h1 class="title">⚔️ GLADIATOR GRAMMAR ARENA ⚔️</h1>
+            <p class="subtitle">Battle through 35 grammar challenges to prove your mastery!</p>
+        </div>
+        
+
+        
+
+        
+        <div id="registration" class="registration">
+            <h2>🏛️ Enter the Arena, Young Scholar! 🏛️</h2>
+            <div class="form-group">
+                <label for="studentName">Your Name:</label>
+                <input type="text" id="studentName" placeholder="Enter your full name" required>
+            </div>
+            <div class="form-group">
+                <label for="studentClass">Your Class:</label>
+                <input type="text" id="studentClass" placeholder="e.g., 9A, Year 9 English, etc." required>
+            </div>
+            <button id="startGameBtn" class="start-btn">Begin the Challenge!</button>
+        </div>
+        
+
+        
+        <div id="gameArea" class="game-area" style="display: none;">
+            <div class="gladiator-panel">
+                <div class="student-info">
+                    <h3 id="displayName">Gladiator Name</h3>
+                    <p id="displayClass">Class</p>
+                </div>
+                
+                <div class="gladiator">
+                    <div id="gladiatorMascot" class="gladiator-mascot">
+                        <div class="animated-gladiator"></div>
+                    </div>
+                    <div class="gladiator-name">GRAMMATICUS MAXIMUS</div>
+                </div>
+                
+                <div class="health-bar">
+                    <div id="healthFill" class="health-fill" style="width: 100%"></div>
+                </div>
+                <div id="healthText" class="health-text">Health: 100/100</div>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <div id="score" class="stat-value">0</div>
+                        <div class="stat-label">Score</div>
+                    </div>
+                    <div class="stat">
+                        <div id="streak" class="stat-value">0</div>
+                        <div class="stat-label">Streak</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question-panel">
+                <div id="questionCounter" class="question-counter">Question 1 of 20</div>
+                <div id="question" class="question"></div>
+                <div id="options" class="options"></div>
+                <div id="feedback" class="feedback"></div>
+                <button id="nextBtn" class="next-btn" style="display: none;">Next Challenge</button>
+            </div>
+        </div>
+        
+        <div id="gameOver" class="game-over" style="display: none;">
+            <h2 id="gameOverTitle"></h2>
+            <div id="finalScore" class="final-score"></div>
+            
+            <div class="scoreboard-section">
+                <h3 style="color: #8B0000; margin-bottom: 15px;">📥 Download Your Results!</h3>
+                <p style="margin-bottom: 15px; color: #654321;">Get your detailed performance report with all questions and explanations!</p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button id="downloadMyResultsBtn" class="scoreboard-btn" style="background: linear-gradient(145deg, #228B22, #32CD32);">📥 Download My Results</button>
+                </div>
+            </div>
+            
+            <button id="restartBtn" class="restart-btn">Enter Arena Again</button>
+        </div>
+    </div>
+
+    <script>
+        class GladiatorGrammar {
+            constructor() {
+                this.studentName = '';
+                this.studentClass = '';
+                this.health = 100;
+                this.maxHealth = 100;
+                this.score = 0;
+                this.streak = 0;
+                this.currentQuestion = 0;
+                this.totalQuestions = 35;
+                this.gameActive = false;
+                this.startTime = null;
+                this.endTime = null;
+                this.answers = [];
+                
+                // Fun gladiator-themed grammar questions for Year 9 students
+                this.questions = [
+                    {
+                        question: "The gladiator roared, 'I shall conquer the arena!' What type of SENTENCE is this?",
+                        options: [
+                            "Declarative sentence",
+                            "Interrogative sentence", 
+                            "Exclamatory sentence",
+                            "Imperative sentence"
+                        ],
+                        correct: 2,
+                        explanation: "An exclamatory sentence expresses strong emotion and ends with an exclamation mark!"
+                    },
+                    {
+                        question: "Which gladiator weapon name is a PROPER NOUN that should be capitalized?",
+                        options: [
+                            "sword",
+                            "trident",
+                            "gladius maximus",
+                            "shield"
+                        ],
+                        correct: 2,
+                        explanation: "'Gladius Maximus' is a specific name for a legendary sword, making it a proper noun requiring capitalization."
+                    },
+                    {
+                        question: "Find the METAPHOR in this gladiator's battle cry: 'My sword is lightning, my shield is thunder!'",
+                        options: [
+                            "My sword is lightning",
+                            "my shield is thunder",
+                            "Both comparisons are metaphors",
+                            "These are similes, not metaphors"
+                        ],
+                        correct: 2,
+                        explanation: "Both are metaphors because they directly compare the sword to lightning and shield to thunder without using 'like' or 'as'."
+                    },
+                    {
+                        question: "The crowd cheered wildly as the gladiator entered the arena. What is the ADVERB in this sentence?",
+                        options: [
+                            "crowd",
+                            "wildly",
+                            "gladiator",
+                            "arena"
+                        ],
+                        correct: 1,
+                        explanation: "'Wildly' is an adverb that describes HOW the crowd cheered (modifies the verb 'cheered')."
+                    },
+                    {
+                        question: "Which sentence shows the gladiator using ACTIVE VOICE?",
+                        options: [
+                            "The lion was defeated by the brave gladiator.",
+                            "The arena was filled by thousands of spectators.",
+                            "The gladiator defeated the fierce lion.",
+                            "The victory was celebrated by the entire crowd."
+                        ],
+                        correct: 2,
+                        explanation: "Active voice: the subject (gladiator) performs the action (defeated) on the object (lion)."
+                    },
+                    {
+                        question: "What type of FIGURATIVE LANGUAGE is used here: 'The gladiator fought like a lion in the arena'?",
+                        options: [
+                            "Metaphor",
+                            "Personification",
+                            "Simile",
+                            "Alliteration"
+                        ],
+                        correct: 2,
+                        explanation: "A simile compares two things using 'like' or 'as'. Here, the gladiator is compared to a lion using 'like'."
+                    },
+                    {
+                        question: "Identify the COMPOUND SUBJECT: 'The gladiator and his opponent circled each other warily.'",
+                        options: [
+                            "The gladiator",
+                            "his opponent",
+                            "The gladiator and his opponent",
+                            "circled each other"
+                        ],
+                        correct: 2,
+                        explanation: "A compound subject has two or more subjects joined by 'and', 'or', or 'nor' that share the same verb."
+                    },
+                    {
+                        question: "Which sentence uses the PAST PERFECT TENSE correctly for our gladiator story?",
+                        options: [
+                            "The gladiator trained hard before he entered the arena.",
+                            "The gladiator had trained hard before he entered the arena.",
+                            "The gladiator was training hard before he entered the arena.",
+                            "The gladiator has trained hard before he entered the arena."
+                        ],
+                        correct: 1,
+                        explanation: "Past perfect (had + past participle) shows an action completed before another past action."
+                    },
+                    {
+                        question: "Find the ONOMATOPOEIA in this gladiator battle: 'CLANG! The swords crashed together with a mighty BOOM!'",
+                        options: [
+                            "swords crashed together",
+                            "CLANG and BOOM",
+                            "mighty",
+                            "together"
+                        ],
+                        correct: 1,
+                        explanation: "Onomatopoeia are words that imitate sounds. 'CLANG' and 'BOOM' represent the sounds of battle."
+                    },
+                    {
+                        question: "What is the COLLECTIVE NOUN for a group of gladiators?",
+                        options: [
+                            "A team of gladiators",
+                            "A band of gladiators",
+                            "A school of gladiators",
+                            "A troupe of gladiators"
+                        ],
+                        correct: 3,
+                        explanation: "A 'troupe' is the collective noun for a group of performers or entertainers, including gladiators."
+                    },
+                    {
+                        question: "Which sentence uses ALLITERATION in describing our gladiator hero?",
+                        options: [
+                            "The brave gladiator fought courageously.",
+                            "The mighty gladiator defeated his enemy.",
+                            "The fierce fighter faced his fearsome foe.",
+                            "The strong warrior won the battle."
+                        ],
+                        correct: 2,
+                        explanation: "Alliteration repeats the same starting sound. 'Fierce fighter faced his fearsome foe' repeats the 'f' sound."
+                    },
+                    {
+                        question: "Identify the INTERJECTION in this gladiator's victory speech: 'Hooray! I have conquered the arena at last!'",
+                        options: [
+                            "Hooray",
+                            "conquered",
+                            "arena",
+                            "at last"
+                        ],
+                        correct: 0,
+                        explanation: "An interjection expresses sudden emotion. 'Hooray!' shows the gladiator's joy and excitement."
+                    },
+                    {
+                        question: "What type of IRONY is shown when the smallest gladiator defeats the giant: 'Tiny Tim triumphed over Goliath the Great'?",
+                        options: [
+                            "Verbal irony",
+                            "Situational irony",
+                            "Dramatic irony",
+                            "No irony present"
+                        ],
+                        correct: 1,
+                        explanation: "Situational irony occurs when the outcome is opposite to what's expected - the small defeating the large."
+                    },
+                    {
+                        question: "Find the PERSONIFICATION: 'The ancient arena walls whispered tales of legendary battles to those who listened.'",
+                        options: [
+                            "ancient arena walls",
+                            "whispered tales",
+                            "legendary battles",
+                            "those who listened"
+                        ],
+                        correct: 1,
+                        explanation: "Personification gives human qualities to non-human things. Walls can't actually 'whisper' - that's a human action."
+                    },
+                    {
+                        question: "Which gladiator name demonstrates correct use of APOSTROPHES for possession?",
+                        options: [
+                            "Maximus's sword gleamed in the sunlight.",
+                            "Maximus' sword gleamed in the sunlight.",
+                            "Maximuss sword gleamed in the sunlight.",
+                            "Both A and B are correct."
+                        ],
+                        correct: 3,
+                        explanation: "For names ending in 's', both Maximus's and Maximus' are acceptable possessive forms."
+                    },
+                    {
+                        question: "What is the MOOD of this gladiator command: 'Fight with honor, young warrior!'?",
+                        options: [
+                            "Indicative mood",
+                            "Imperative mood",
+                            "Subjunctive mood",
+                            "Interrogative mood"
+                        ],
+                        correct: 1,
+                        explanation: "Imperative mood gives commands or makes requests. 'Fight with honor' is a command to the warrior."
+                    },
+                    {
+                        question: "Identify the OXYMORON in this gladiator description: 'He was a gentle warrior, showing cruel kindness to his enemies.'",
+                        options: [
+                            "gentle warrior",
+                            "cruel kindness",
+                            "Both are oxymorons",
+                            "Neither is an oxymoron"
+                        ],
+                        correct: 2,
+                        explanation: "Both 'gentle warrior' and 'cruel kindness' combine contradictory terms, making them oxymorons."
+                    },
+                    {
+                        question: "Which sentence uses PARALLEL STRUCTURE correctly for listing gladiator skills?",
+                        options: [
+                            "The gladiator was skilled at fighting, defending, and to attack.",
+                            "The gladiator was skilled at fighting, defending, and attacking.",
+                            "The gladiator was skilled at to fight, defending, and attacking.",
+                            "The gladiator was skilled at fighting, to defend, and attacking."
+                        ],
+                        correct: 1,
+                        explanation: "Parallel structure uses the same grammatical form: fighting, defending, attacking (all gerunds)."
+                    },
+                    {
+                        question: "Find the HYPERBOLE in this gladiator's boast: 'I've fought a million battles and never lost once!'",
+                        options: [
+                            "I've fought",
+                            "a million battles",
+                            "never lost once",
+                            "No hyperbole present"
+                        ],
+                        correct: 1,
+                        explanation: "Hyperbole is extreme exaggeration. 'A million battles' is an exaggerated number for dramatic effect."
+                    },
+                    {
+                        question: "What type of SENTENCE STRUCTURE is: 'When the horn sounded, the gladiators charged, and the crowd roared with excitement'?",
+                        options: [
+                            "Simple sentence",
+                            "Compound sentence",
+                            "Complex sentence",
+                            "Compound-complex sentence"
+                        ],
+                        correct: 3,
+                        explanation: "Contains a dependent clause (When the horn sounded) and two independent clauses joined by 'and'."
+                    },
+                    {
+                        question: "Which gladiator motto uses ALLUSION correctly?",
+                        options: [
+                            "I fight like Hercules with the strength of Atlas!",
+                            "I am as strong as an ox in battle!",
+                            "My sword cuts through enemies like butter!",
+                            "I roar louder than a lion!"
+                        ],
+                        correct: 0,
+                        explanation: "Allusion references well-known figures. Hercules and Atlas are mythological figures known for their strength."
+                    },
+                    {
+                        question: "Identify the DANGLING MODIFIER: 'Entering the arena proudly, the crowd cheered for the gladiator.'",
+                        options: [
+                            "Entering the arena proudly",
+                            "the crowd cheered",
+                            "for the gladiator",
+                            "No dangling modifier present"
+                        ],
+                        correct: 0,
+                        explanation: "'Entering the arena proudly' dangles because it seems to modify 'crowd' when it should modify 'gladiator'."
+                    },
+                    {
+                        question: "What literary device creates rhythm in: 'Brave gladiators battle boldly beneath blazing sun'?",
+                        options: [
+                            "Rhyme",
+                            "Alliteration",
+                            "Assonance",
+                            "Consonance"
+                        ],
+                        correct: 1,
+                        explanation: "Alliteration repeats the 'b' sound at the beginning of words, creating a rhythmic effect."
+                    },
+                    {
+                        question: "Which sentence shows CORRECT COMMA usage in a gladiator's address?",
+                        options: [
+                            "Citizens of Rome I fight for your honor!",
+                            "Citizens of Rome, I fight for your honor!",
+                            "Citizens, of Rome I fight for your honor!",
+                            "Citizens of Rome I fight, for your honor!"
+                        ],
+                        correct: 1,
+                        explanation: "Use a comma after a direct address. 'Citizens of Rome' is who the gladiator is addressing."
+                    },
+                    {
+                        question: "Find the SYMBOLISM: 'The gladiator's broken chain represented his journey from slave to champion.'",
+                        options: [
+                            "gladiator's",
+                            "broken chain",
+                            "journey",
+                            "champion"
+                        ],
+                        correct: 1,
+                        explanation: "The 'broken chain' symbolizes freedom and breaking free from slavery - it represents something beyond its literal meaning."
+                    },
+                    {
+                        question: "Which sentence uses SEMICOLONS correctly?",
+                        options: [
+                            "The gladiator trained hard; however, he was still nervous.",
+                            "The gladiator trained hard; but he was still nervous.",
+                            "The gladiator trained hard; and he was still nervous.",
+                            "The gladiator trained hard; so he was still nervous."
+                        ],
+                        correct: 0,
+                        explanation: "Use semicolons before conjunctive adverbs like 'however', 'therefore', 'nevertheless'."
+                    },
+                    {
+                        question: "Identify the GERUND in: 'Fighting in the arena was the gladiator's greatest honor.'",
+                        options: [
+                            "Fighting",
+                            "arena",
+                            "gladiator's",
+                            "honor"
+                        ],
+                        correct: 0,
+                        explanation: "A gerund is a verb form ending in -ing that functions as a noun. 'Fighting' is the subject of the sentence."
+                    },
+                    {
+                        question: "Which shows correct APOSTROPHE usage for multiple gladiators?",
+                        options: [
+                            "The gladiator's swords were sharp.",
+                            "The gladiators sword's were sharp.",
+                            "The gladiators' swords were sharp.",
+                            "The gladiators swords' were sharp."
+                        ],
+                        correct: 2,
+                        explanation: "For plural nouns ending in 's', add only an apostrophe after the 's' to show possession."
+                    },
+                    {
+                        question: "Find the INFINITIVE PHRASE: 'The gladiator's goal was to win the championship.'",
+                        options: [
+                            "The gladiator's goal",
+                            "was to win",
+                            "to win the championship",
+                            "the championship"
+                        ],
+                        correct: 2,
+                        explanation: "An infinitive phrase begins with 'to' plus a verb and includes any modifiers or objects."
+                    },
+                    {
+                        question: "Which sentence uses QUOTATION MARKS correctly?",
+                        options: [
+                            "The gladiator shouted 'Victory is mine!'",
+                            "The gladiator shouted, 'Victory is mine!'",
+                            "The gladiator shouted, \"Victory is mine!\"",
+                            "The gladiator shouted: \"Victory is mine!\""
+                        ],
+                        correct: 2,
+                        explanation: "Use a comma before quoted speech and double quotation marks around the exact words spoken."
+                    },
+                    {
+                        question: "Identify the PARTICIPIAL PHRASE: 'Exhausted from battle, the gladiator rested.'",
+                        options: [
+                            "Exhausted from battle",
+                            "the gladiator rested",
+                            "from battle",
+                            "gladiator rested"
+                        ],
+                        correct: 0,
+                        explanation: "A participial phrase begins with a participle (past or present) and modifies a noun or pronoun."
+                    },
+                    {
+                        question: "Which demonstrates CORRECT COLON usage?",
+                        options: [
+                            "The gladiator had three weapons: sword, shield, and spear.",
+                            "The gladiator had: sword, shield, and spear.",
+                            "The gladiator: had three weapons, sword, shield, and spear.",
+                            "The gladiator had three: weapons, sword, shield, and spear."
+                        ],
+                        correct: 0,
+                        explanation: "Use a colon after a complete sentence to introduce a list, explanation, or example."
+                    },
+                    {
+                        question: "Find the APPOSITIVE: 'Marcus, the bravest gladiator, won every battle.'",
+                        options: [
+                            "Marcus",
+                            "the bravest gladiator",
+                            "won every battle",
+                            "every battle"
+                        ],
+                        correct: 1,
+                        explanation: "An appositive renames or explains a noun. 'The bravest gladiator' renames 'Marcus'."
+                    },
+                    {
+                        question: "Which shows the SUBJUNCTIVE MOOD correctly?",
+                        options: [
+                            "If the gladiator was here, he would fight.",
+                            "If the gladiator were here, he would fight.",
+                            "If the gladiator is here, he would fight.",
+                            "If the gladiator will be here, he would fight."
+                        ],
+                        correct: 1,
+                        explanation: "Use 'were' (not 'was') in hypothetical or contrary-to-fact situations with 'if' clauses."
+                    },
+                    {
+                        question: "Identify the ELLIPSIS usage: 'The gladiator paused... then struck with lightning speed.'",
+                        options: [
+                            "Shows incomplete thought",
+                            "Indicates dramatic pause",
+                            "Represents missing words",
+                            "Shows trailing off speech"
+                        ],
+                        correct: 1,
+                        explanation: "The ellipsis here creates dramatic tension by showing a pause before the action."
+                    },
+                    {
+                        question: "Which sentence uses PARALLEL STRUCTURE in a series correctly?",
+                        options: [
+                            "The gladiator was brave, skilled, and showing courage.",
+                            "The gladiator was brave, skilled, and courageous.",
+                            "The gladiator was brave, with skill, and courageous.",
+                            "The gladiator was being brave, skilled, and courageous."
+                        ],
+                        correct: 1,
+                        explanation: "Parallel structure requires the same grammatical form: brave, skilled, courageous (all adjectives)."
+                    },
+                    {
+                        question: "Which sentence uses the correct COMPARATIVE form of the adjective?",
+                        options: [
+                            "This gladiator is more stronger than his opponent.",
+                            "This gladiator is strongest than his opponent.",
+                            "This gladiator is stronger than his opponent.",
+                            "This gladiator is more strong than his opponent."
+                        ],
+                        correct: 2,
+                        explanation: "For one-syllable adjectives like 'strong', add -er for comparative form: stronger."
+                    },
+                    {
+                        question: "Which demonstrates correct CONDITIONAL SENTENCE structure?",
+                        options: [
+                            "If the gladiator would train harder, he will win.",
+                            "If the gladiator trains harder, he would win.",
+                            "If the gladiator trains harder, he will win.",
+                            "If the gladiator trained harder, he will win."
+                        ],
+                        correct: 2,
+                        explanation: "First conditional: If + present simple, will + base verb (for real future possibilities)."
+                    },
+                    {
+                        question: "Which sentence correctly uses THERE, THEIR, or THEY'RE?",
+                        options: [
+                            "The gladiators left there weapons in the armory.",
+                            "Their going to fight in the arena tomorrow.",
+                            "They're preparing for the biggest battle of their lives.",
+                            "The crowd cheered when they saw there favorite fighter."
+                        ],
+                        correct: 2,
+                        explanation: "They're = they are (contraction). Their = possessive. There = location or existence."
+                    }
+                ];
+                
+                this.init();
+            }
+            
+            init() {
+                // Initialize sound effects
+                this.initSounds();
+                
+                // Wait for DOM to be ready
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        this.bindEvents();
+                    });
+                } else {
+                    this.bindEvents();
+                }
+            }
+            
+            initSounds() {
+                // Create gladiator-themed sound effects using Web Audio API
+                this.audioContext = null;
+                
+                // Initialize audio context on first user interaction
+                this.soundsReady = false;
+                this.initAudioContext = () => {
+                    if (!this.audioContext) {
+                        try {
+                            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                            this.soundsReady = true;
+                        } catch (e) {
+                            console.log('Audio not supported');
+                        }
+                    }
+                };
+            }
+            
+            playVictorySound() {
+                if (!this.soundsReady || !this.audioContext) return;
+                
+                try {
+                    // Crowd cheering sound effect
+                    this.createCrowdCheer();
+                } catch (e) {
+                    console.log('Victory sound failed:', e);
+                }
+            }
+            
+            createCrowdCheer() {
+                // Create multiple noise sources to simulate crowd cheering
+                const duration = 2.0;
+                const bufferSize = this.audioContext.sampleRate * duration;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Generate crowd noise with varying intensity
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / this.audioContext.sampleRate;
+                    // Create cheering sound with multiple frequency components
+                    let sample = 0;
+                    
+                    // Base crowd rumble (low frequency)
+                    sample += (Math.random() * 2 - 1) * 0.3 * Math.sin(t * 50);
+                    
+                    // Mid-range cheering voices
+                    sample += (Math.random() * 2 - 1) * 0.4 * Math.sin(t * 200 + Math.sin(t * 5));
+                    
+                    // High-pitched cheers and whistles
+                    sample += (Math.random() * 2 - 1) * 0.2 * Math.sin(t * 800 + Math.sin(t * 12));
+                    
+                    // Clapping simulation
+                    if (Math.random() < 0.02) {
+                        sample += (Math.random() * 2 - 1) * 0.8;
+                    }
+                    
+                    // Envelope to make it fade in and out naturally
+                    const envelope = Math.sin(t * Math.PI / duration) * 0.7;
+                    data[i] = sample * envelope;
+                }
+                
+                // Play the crowd cheer
+                const source = this.audioContext.createBufferSource();
+                const gainNode = this.audioContext.createGain();
+                const filter = this.audioContext.createBiquadFilter();
+                
+                source.buffer = buffer;
+                source.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                // Filter to make it sound more like a distant crowd
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(3000, this.audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.4, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                
+                source.start(this.audioContext.currentTime);
+                source.stop(this.audioContext.currentTime + duration);
+            }
+            
+            playDefeatSound() {
+                if (!this.soundsReady || !this.audioContext) return;
+                
+                try {
+                    // Stabbing/knockout sound effect
+                    this.createStabbingSound();
+                } catch (e) {
+                    console.log('Defeat sound failed:', e);
+                }
+            }
+            
+            createStabbingSound() {
+                // Sharp stabbing sound followed by knockout thud
+                const stabbingDuration = 0.15;
+                const thudDuration = 0.8;
+                
+                // Part 1: Sharp stabbing sound
+                const stabbingOsc = this.audioContext.createOscillator();
+                const stabbingGain = this.audioContext.createGain();
+                const stabbingFilter = this.audioContext.createBiquadFilter();
+                
+                stabbingOsc.connect(stabbingFilter);
+                stabbingFilter.connect(stabbingGain);
+                stabbingGain.connect(this.audioContext.destination);
+                
+                // Sharp, piercing frequency for stab
+                stabbingOsc.frequency.setValueAtTime(2000, this.audioContext.currentTime);
+                stabbingOsc.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + stabbingDuration);
+                stabbingOsc.type = 'sawtooth';
+                
+                stabbingFilter.type = 'bandpass';
+                stabbingFilter.frequency.setValueAtTime(1500, this.audioContext.currentTime);
+                stabbingFilter.Q.setValueAtTime(10, this.audioContext.currentTime);
+                
+                stabbingGain.gain.setValueAtTime(0.6, this.audioContext.currentTime);
+                stabbingGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + stabbingDuration);
+                
+                stabbingOsc.start(this.audioContext.currentTime);
+                stabbingOsc.stop(this.audioContext.currentTime + stabbingDuration);
+                
+                // Part 2: Body falling/knockout thud (delayed)
+                setTimeout(() => {
+                    const thudOsc = this.audioContext.createOscillator();
+                    const thudGain = this.audioContext.createGain();
+                    const thudFilter = this.audioContext.createBiquadFilter();
+                    
+                    thudOsc.connect(thudFilter);
+                    thudFilter.connect(thudGain);
+                    thudGain.connect(this.audioContext.destination);
+                    
+                    // Low, heavy thud sound
+                    thudOsc.frequency.setValueAtTime(80, this.audioContext.currentTime);
+                    thudOsc.frequency.exponentialRampToValueAtTime(40, this.audioContext.currentTime + thudDuration);
+                    thudOsc.type = 'triangle';
+                    
+                    thudFilter.type = 'lowpass';
+                    thudFilter.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                    
+                    thudGain.gain.setValueAtTime(0.4, this.audioContext.currentTime);
+                    thudGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + thudDuration);
+                    
+                    thudOsc.start(this.audioContext.currentTime);
+                    thudOsc.stop(this.audioContext.currentTime + thudDuration);
+                }, 200);
+                
+                // Part 3: Crowd gasp/shock sound (delayed)
+                setTimeout(() => {
+                    this.createCrowdGasp();
+                }, 300);
+            }
+            
+            createCrowdGasp() {
+                // Create a crowd gasp/shock sound
+                const duration = 1.2;
+                const bufferSize = this.audioContext.sampleRate * duration;
+                const buffer = this.audioContext.createBuffer(1, bufferSize, this.audioContext.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Generate crowd gasp with sharp intake sound
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / this.audioContext.sampleRate;
+                    let sample = 0;
+                    
+                    // Sharp intake sound (like a gasp)
+                    if (t < 0.3) {
+                        sample += (Math.random() * 2 - 1) * 0.4 * Math.sin(t * 400 + Math.sin(t * 20));
+                        sample += (Math.random() * 2 - 1) * 0.2 * Math.sin(t * 800);
+                    }
+                    
+                    // Murmuring/shocked crowd
+                    sample += (Math.random() * 2 - 1) * 0.2 * Math.sin(t * 150 + Math.sin(t * 3));
+                    
+                    // Envelope for natural fade
+                    const envelope = Math.exp(-t * 2) * 0.6;
+                    data[i] = sample * envelope;
+                }
+                
+                // Play the crowd gasp
+                const source = this.audioContext.createBufferSource();
+                const gainNode = this.audioContext.createGain();
+                const filter = this.audioContext.createBiquadFilter();
+                
+                source.buffer = buffer;
+                source.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                filter.type = 'highpass';
+                filter.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                
+                source.start(this.audioContext.currentTime);
+                source.stop(this.audioContext.currentTime + duration);
+            }
+            
+            playSwordClashSound() {
+                if (!this.soundsReady || !this.audioContext) return;
+                
+                try {
+                    // Sword clash sound - metallic clang
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    const filter = this.audioContext.createBiquadFilter();
+                    
+                    oscillator.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.1);
+                    
+                    oscillator.type = 'square';
+                    filter.type = 'highpass';
+                    filter.frequency.setValueAtTime(400, this.audioContext.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(0.4, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + 0.2);
+                } catch (e) {
+                    console.log('Sword clash sound failed:', e);
+                }
+            }
+            
+
+            
+            bindEvents() {
+                document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('nextBtn').addEventListener('click', () => this.nextQuestion());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restart());
+                document.getElementById('downloadMyResultsBtn').addEventListener('click', () => this.downloadMyResults());
+                
+
+            }
+            
+            startGame() {
+                const name = document.getElementById('studentName').value.trim();
+                const studentClass = document.getElementById('studentClass').value.trim();
+                
+                if (!name || !studentClass) {
+                    alert('Please enter both your name and class before starting!');
+                    return;
+                }
+                
+                // Initialize audio context on first user interaction
+                this.initAudioContext();
+                
+                this.studentName = name;
+                this.studentClass = studentClass;
+                this.startTime = new Date();
+                
+                document.getElementById('displayName').textContent = name;
+                document.getElementById('displayClass').textContent = studentClass;
+                
+                document.getElementById('registration').style.display = 'none';
+                document.getElementById('gameArea').style.display = 'grid';
+                
+                this.gameActive = true;
+                this.shuffleQuestions();
+                this.displayQuestion();
+            }
+            
+            shuffleQuestions() {
+                for (let i = this.questions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.questions[i], this.questions[j]] = [this.questions[j], this.questions[i]];
+                }
+            }
+            
+            displayQuestion() {
+                if (this.currentQuestion >= this.totalQuestions || this.health <= 0) {
+                    this.endGame();
+                    return;
+                }
+                
+                const question = this.questions[this.currentQuestion];
+                document.getElementById('questionCounter').textContent = `Question ${this.currentQuestion + 1} of ${this.totalQuestions}`;
+                document.getElementById('question').textContent = question.question;
+                
+                const optionsContainer = document.getElementById('options');
+                optionsContainer.innerHTML = '';
+                
+                question.options.forEach((option, index) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'option';
+                    optionElement.textContent = option;
+                    optionElement.addEventListener('click', () => this.selectAnswer(index));
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                document.getElementById('feedback').textContent = '';
+                document.getElementById('nextBtn').style.display = 'none';
+            }
+            
+            selectAnswer(selectedIndex) {
+                if (!this.gameActive) return;
+                
+                const question = this.questions[this.currentQuestion];
+                const options = document.querySelectorAll('.option');
+                const feedback = document.getElementById('feedback');
+                const mascot = document.getElementById('gladiatorMascot');
+                const animatedGladiator = mascot.querySelector('.animated-gladiator');
+                
+                // Record the answer
+                this.answers.push({
+                    question: question.question,
+                    selectedAnswer: question.options[selectedIndex],
+                    correctAnswer: question.options[question.correct],
+                    isCorrect: selectedIndex === question.correct,
+                    explanation: question.explanation
+                });
+                
+                // Disable all options
+                options.forEach(option => {
+                    option.style.pointerEvents = 'none';
+                });
+                
+                if (selectedIndex === question.correct) {
+                    // Correct answer
+                    options[selectedIndex].classList.add('correct');
+                    feedback.textContent = `⚔️ Excellent! ${question.explanation}`;
+                    feedback.className = 'feedback correct';
+                    
+                    // Play victory sound
+                    this.playVictorySound();
+                    
+                    // Animate mascot cheering
+                    animatedGladiator.classList.remove('incorrect', 'defeated');
+                    animatedGladiator.classList.add('correct');
+                    
+                    this.health = Math.min(this.maxHealth, this.health + 10);
+                    this.score += 10;
+                    this.streak += 1;
+                    
+                    // Bonus points for streak
+                    if (this.streak >= 3) {
+                        this.score += 5;
+                        feedback.textContent += ` Streak bonus: +5 points!`;
+                    }
+                    
+                    setTimeout(() => {
+                        animatedGladiator.classList.remove('correct');
+                    }, 1500);
+                } else {
+                    // Wrong answer
+                    options[selectedIndex].classList.add('incorrect');
+                    options[question.correct].classList.add('correct');
+                    feedback.textContent = `💔 Not quite! ${question.explanation}`;
+                    feedback.className = 'feedback incorrect';
+                    
+                    // Play defeat sound (includes stabbing and knockout effects)
+                    this.playDefeatSound();
+                    
+                    // Animate mascot being hit
+                    animatedGladiator.classList.remove('correct');
+                    animatedGladiator.classList.add('incorrect');
+                    
+                    this.health = Math.max(0, this.health - 15);
+                    this.streak = 0;
+                    
+                    setTimeout(() => {
+                        animatedGladiator.classList.remove('incorrect');
+                        if (this.health <= 0) {
+                            animatedGladiator.classList.add('defeated');
+                        }
+                    }, 2500);
+                }
+                
+                this.updateDisplay();
+                document.getElementById('nextBtn').style.display = 'block';
+                
+                if (this.health <= 0) {
+                    setTimeout(() => this.endGame(), 2000);
+                }
+            }
+            
+            updateDisplay() {
+                const healthPercentage = (this.health / this.maxHealth) * 100;
+                document.getElementById('healthFill').style.width = `${healthPercentage}%`;
+                document.getElementById('healthText').textContent = `Health: ${this.health}/${this.maxHealth}`;
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('streak').textContent = this.streak;
+            }
+            
+            nextQuestion() {
+                this.currentQuestion++;
+                
+                // Re-enable options
+                const options = document.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.style.pointerEvents = 'auto';
+                    option.classList.remove('correct', 'incorrect');
+                });
+                
+                this.displayQuestion();
+            }
+            
+            endGame() {
+                this.gameActive = false;
+                this.endTime = new Date();
+                
+                document.getElementById('gameArea').style.display = 'none';
+                document.getElementById('gameOver').style.display = 'block';
+                
+                const gameOverTitle = document.getElementById('gameOverTitle');
+                const finalScore = document.getElementById('finalScore');
+                
+                if (this.health <= 0) {
+                    gameOverTitle.textContent = '💀 GLADIATOR DEFEATED! 💀';
+                    gameOverTitle.style.color = '#DC143C';
+                } else {
+                    gameOverTitle.textContent = '🏆 VICTORIOUS GLADIATOR! 🏆';
+                    gameOverTitle.style.color = '#228B22';
+                }
+                
+                const correctAnswers = this.answers.filter(a => a.isCorrect).length;
+                const accuracy = Math.round((correctAnswers / this.answers.length) * 100);
+                const timeTaken = Math.round((this.endTime - this.startTime) / 1000 / 60);
+                
+                finalScore.innerHTML = `
+                    <strong>Final Score: ${this.score} points</strong><br>
+                    Questions Completed: ${this.currentQuestion}/${this.totalQuestions}<br>
+                    Correct Answers: ${correctAnswers}/${this.answers.length}<br>
+                    Final Health: ${this.health}/${this.maxHealth}<br>
+                    Accuracy: ${accuracy}%<br>
+                    Time Taken: ${timeTaken} minutes
+                `;
+                
+                // Game completed - results ready for download
+            }
+            
+
+            
+
+            
+            downloadMyResults() {
+                if (!this.answers || this.answers.length === 0) {
+                    this.showMessage('No game data available to download! Please complete a game first.', 'error');
+                    return;
+                }
+                
+                try {
+                    const correctAnswers = this.answers.filter(a => a.isCorrect).length;
+                    const accuracy = Math.round((correctAnswers / this.answers.length) * 100);
+                    const timeTaken = this.endTime && this.startTime ? Math.round((this.endTime - this.startTime) / 1000 / 60) : 0;
+                    
+                    // Create detailed text content
+                    let content = '';
+                    
+                    // Header section with student info and summary
+                    content += `GLADIATOR GRAMMAR ARENA - DETAILED RESULTS\n`;
+                    content += `==========================================\n\n`;
+                    content += `Student Name: ${this.studentName}\n`;
+                    content += `Class: ${this.studentClass}\n`;
+                    content += `Date Completed: ${new Date().toLocaleDateString()}\n`;
+                    if (this.startTime) content += `Time Started: ${this.startTime.toLocaleTimeString()}\n`;
+                    if (this.endTime) content += `Time Finished: ${this.endTime.toLocaleTimeString()}\n`;
+                    content += `Total Time: ${timeTaken} minutes\n\n`;
+                    
+                    // Summary statistics
+                    content += `PERFORMANCE SUMMARY\n`;
+                    content += `==================\n`;
+                    content += `Final Score: ${this.score} points\n`;
+                    content += `Final Health: ${this.health}/100\n`;
+                    content += `Questions Completed: ${this.currentQuestion}/${this.totalQuestions}\n`;
+                    content += `Correct Answers: ${correctAnswers}/${this.answers.length}\n`;
+                    content += `Accuracy: ${accuracy}%\n`;
+                    content += `Best Streak: ${Math.max(...this.getStreakHistory())}\n\n`;
+                    
+                    // Detailed question-by-question breakdown
+                    content += `QUESTION-BY-QUESTION BREAKDOWN\n`;
+                    content += `==============================\n\n`;
+                    
+                    let runningScore = 0;
+                    let runningHealth = 100;
+                    let currentStreak = 0;
+                    
+                    this.answers.forEach((answer, index) => {
+                        if (answer.isCorrect) {
+                            runningScore += 10;
+                            runningHealth = Math.min(100, runningHealth + 10);
+                            currentStreak += 1;
+                            if (currentStreak >= 3) {
+                                runningScore += 5; // Streak bonus
+                            }
+                        } else {
+                            runningHealth = Math.max(0, runningHealth - 15);
+                            currentStreak = 0;
+                        }
+                        
+                        const pointsEarned = answer.isCorrect ? (currentStreak >= 3 ? 15 : 10) : 0;
+                        
+                        content += `Question ${index + 1}:\n`;
+                        content += `${answer.question}\n`;
+                        content += `Your Answer: ${answer.selectedAnswer}\n`;
+                        content += `Correct Answer: ${answer.correctAnswer}\n`;
+                        content += `Result: ${answer.isCorrect ? 'CORRECT ✓' : 'INCORRECT ✗'}\n`;
+                        content += `Points Earned: ${pointsEarned}\n`;
+                        content += `Health After: ${runningHealth}\n`;
+                        content += `Streak After: ${currentStreak}\n`;
+                        content += `Explanation: ${answer.explanation}\n`;
+                        content += `${'='.repeat(50)}\n\n`;
+                    });
+                    
+                    // Health progression
+                    content += `HEALTH PROGRESSION\n`;
+                    content += `==================\n`;
+                    content += `Starting Health: 100\n`;
+                    let healthTracker = 100;
+                    this.answers.forEach((answer, index) => {
+                        if (answer.isCorrect) {
+                            healthTracker = Math.min(100, healthTracker + 10);
+                            content += `After Question ${index + 1}: ${healthTracker} (+10 for correct answer)\n`;
+                        } else {
+                            healthTracker = Math.max(0, healthTracker - 15);
+                            content += `After Question ${index + 1}: ${healthTracker} (-15 for incorrect answer)\n`;
+                        }
+                    });
+                    
+                    const fileName = `${this.studentName.replace(/[^a-zA-Z0-9]/g, '_')}_Grammar_Results_${new Date().toISOString().split('T')[0]}.txt`;
+                    
+                    // Multiple download methods for maximum compatibility
+                    let downloadSuccess = false;
+                    
+                    // Method 1: Modern download API
+                    try {
+                        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = fileName;
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                        downloadSuccess = true;
+                        this.showMessage(`✅ Results Downloaded Successfully!\nFile: ${fileName}\nIncludes complete question breakdown and performance analysis.`, 'success');
+                    } catch (e) {
+                        console.log('Method 1 failed:', e);
+                    }
+                    
+                    // Method 2: Data URL fallback
+                    if (!downloadSuccess) {
+                        try {
+                            const dataUrl = 'data:text/plain;charset=utf-8,' + encodeURIComponent(content);
+                            const link = document.createElement('a');
+                            link.href = dataUrl;
+                            link.download = fileName;
+                            link.style.display = 'none';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            downloadSuccess = true;
+                            this.showMessage(`✅ Results Downloaded Successfully!\nFile: ${fileName}`, 'success');
+                        } catch (e) {
+                            console.log('Method 2 failed:', e);
+                        }
+                    }
+                    
+                    // Method 3: Copy to clipboard as final fallback
+                    if (!downloadSuccess) {
+                        try {
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                                navigator.clipboard.writeText(content).then(() => {
+                                    this.showMessage('📋 Results Copied to Clipboard!\nYour detailed results have been copied. Paste them into a text document to save.', 'warning');
+                                });
+                            } else {
+                                // Fallback clipboard method
+                                const textarea = document.createElement('textarea');
+                                textarea.value = content;
+                                textarea.style.position = 'fixed';
+                                textarea.style.opacity = '0';
+                                document.body.appendChild(textarea);
+                                textarea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textarea);
+                                this.showMessage('📋 Results Copied to Clipboard!\nYour detailed results have been copied. Paste them into a text document to save.', 'warning');
+                            }
+                        } catch (e) {
+                            console.log('Clipboard method failed:', e);
+                            this.showMessage('❌ Download Failed\nUnable to download or copy results. Please try again or contact your teacher.', 'error');
+                        }
+                    }
+                    
+                } catch (error) {
+                    console.error('Download error:', error);
+                    this.showMessage('❌ Download Error\nThere was a problem downloading your results. Please try again or contact your teacher.', 'error');
+                }
+            }
+            
+            showMessage(message, type) {
+                const colors = {
+                    success: { bg: '#90EE90', border: '#228B22', text: '#006400' },
+                    warning: { bg: '#FFE4B5', border: '#DEB887', text: '#8B4513' },
+                    error: { bg: '#FFB6C1', border: '#DC143C', text: '#8B0000' }
+                };
+                
+                const color = colors[type] || colors.error;
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                    background: ${color.bg}; padding: 20px; border-radius: 10px; 
+                    border: 2px solid ${color.border}; z-index: 10000; text-align: center; 
+                    font-family: Cinzel, serif; max-width: 400px; white-space: pre-line;
+                `;
+                messageDiv.innerHTML = `
+                    <p style="color: ${color.text}; font-weight: bold; margin-bottom: 15px;">${message}</p>
+                    <button onclick="this.parentElement.remove()" 
+                            style="margin-top: 10px; padding: 8px 16px; background: ${color.border}; 
+                                   color: white; border: none; border-radius: 5px; cursor: pointer;">OK</button>
+                `;
+                document.body.appendChild(messageDiv);
+                
+                // Auto-remove after 10 seconds
+                setTimeout(() => {
+                    if (messageDiv.parentElement) {
+                        messageDiv.remove();
+                    }
+                }, 10000);
+            }
+            
+            getStreakHistory() {
+                let streaks = [0];
+                let currentStreak = 0;
+                
+                this.answers.forEach(answer => {
+                    if (answer.isCorrect) {
+                        currentStreak++;
+                    } else {
+                        streaks.push(currentStreak);
+                        currentStreak = 0;
+                    }
+                });
+                streaks.push(currentStreak);
+                
+                return streaks;
+            }
+            
+
+            
+            restart() {
+                this.health = 100;
+                this.score = 0;
+                this.streak = 0;
+                this.currentQuestion = 0;
+                this.gameActive = false;
+                this.answers = [];
+                
+                document.getElementById('gameArea').style.display = 'none';
+                document.getElementById('gameOver').style.display = 'none';
+                document.getElementById('registration').style.display = 'block';
+                
+                // Clear form
+                document.getElementById('studentName').value = '';
+                document.getElementById('studentClass').value = '';
+                
+                // Reset mascot
+                const mascot = document.getElementById('gladiatorMascot');
+                const animatedGladiator = mascot.querySelector('.animated-gladiator');
+                animatedGladiator.className = 'animated-gladiator';
+                
+                this.updateDisplay();
+            }
+        }
+        
+        // Start the game when page loads
+        let game; // Global variable for teacher panel access
+        window.addEventListener('load', () => {
+            game = new GladiatorGrammar();
+            window.game = game; // Make game globally accessible for delete buttons
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96aebe86b17e2a90',t:'MTc1NDQ4NTUxMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

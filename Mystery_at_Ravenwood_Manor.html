@@ -1,0 +1,3312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystery at Ravenwood Manor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #f4f1de;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* Enhanced Rain Animation */
+        .rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .rain::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 98px,
+                rgba(255,255,255,0.03) 100px
+            );
+            animation: rain 0.5s linear infinite;
+        }
+        
+        .rain::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 50px;
+            width: 100%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 120px,
+                rgba(255,255,255,0.02) 122px
+            );
+            animation: rain 0.7s linear infinite;
+        }
+        
+        @keyframes rain {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(50%); }
+        }
+        
+        /* Parallax Background Layers */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle at 30% 70%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(212, 175, 55, 0.05) 0%, transparent 50%);
+            animation: parallaxFloat 20s ease-in-out infinite;
+            z-index: 0;
+        }
+        
+        @keyframes parallaxFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-20px, -10px) scale(1.02); }
+        }
+        
+        /* Lightning Flash */
+        .lightning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2;
+            animation: lightning 8s infinite;
+        }
+        
+        @keyframes lightning {
+            0%, 90%, 100% { opacity: 0; }
+            91%, 92% { opacity: 0.8; }
+            93%, 94% { opacity: 0; }
+            95% { opacity: 0.6; }
+        }
+        
+        /* Enhanced Candle Effects */
+        .candle-glow {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(255, 200, 100, 0.8) 0%, rgba(255, 150, 50, 0.4) 40%, transparent 70%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flicker 2s ease-in-out infinite alternate;
+            z-index: 3;
+        }
+        
+        .candle-left {
+            position: fixed;
+            top: 50%;
+            left: 30px;
+            width: 40px;
+            height: 60px;
+            background: radial-gradient(circle, rgba(255, 180, 80, 0.6) 0%, rgba(255, 120, 30, 0.3) 40%, transparent 70%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flicker2 2.5s ease-in-out infinite alternate;
+            z-index: 3;
+        }
+        
+        .candle-bottom {
+            position: fixed;
+            bottom: 100px;
+            right: 50%;
+            width: 50px;
+            height: 70px;
+            background: radial-gradient(circle, rgba(255, 190, 90, 0.7) 0%, rgba(255, 140, 40, 0.35) 40%, transparent 70%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: flicker3 1.8s ease-in-out infinite alternate;
+            z-index: 3;
+        }
+
+        /* Special candle effects for Library and Study */
+        .library-candles, .study-candles {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 5;
+        }
+
+        .room-candle {
+            width: 30px;
+            height: 50px;
+            background: radial-gradient(circle, rgba(255, 200, 100, 0.9) 0%, rgba(255, 150, 50, 0.5) 40%, transparent 70%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: roomFlicker 1.5s ease-in-out infinite alternate;
+        }
+
+        .room-candle:nth-child(2) {
+            animation-delay: 0.3s;
+            animation-duration: 1.8s;
+        }
+
+        .room-candle:nth-child(3) {
+            animation-delay: 0.6s;
+            animation-duration: 2.1s;
+        }
+
+        @keyframes roomFlicker {
+            0% { 
+                transform: scale(1) rotate(-0.5deg); 
+                opacity: 0.8;
+                filter: brightness(1);
+            }
+            25% { 
+                transform: scale(1.1) rotate(1deg); 
+                opacity: 0.6;
+                filter: brightness(1.2);
+            }
+            50% { 
+                transform: scale(0.9) rotate(-1deg); 
+                opacity: 0.9;
+                filter: brightness(0.8);
+            }
+            75% { 
+                transform: scale(1.05) rotate(0.5deg); 
+                opacity: 0.7;
+                filter: brightness(1.1);
+            }
+            100% { 
+                transform: scale(0.95) rotate(-0.5deg); 
+                opacity: 0.85;
+                filter: brightness(0.9);
+            }
+        }
+        
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-1deg); opacity: 0.9; }
+            50% { transform: scale(1.05) rotate(1deg); opacity: 0.7; }
+            100% { transform: scale(0.98) rotate(-0.5deg); opacity: 0.95; }
+        }
+        
+        @keyframes flicker2 {
+            0% { transform: scale(0.95) rotate(0.5deg); opacity: 0.8; }
+            50% { transform: scale(1.1) rotate(-1deg); opacity: 0.6; }
+            100% { transform: scale(1.02) rotate(0.5deg); opacity: 0.9; }
+        }
+        
+        @keyframes flicker3 {
+            0% { transform: scale(1.02) rotate(-0.5deg); opacity: 0.85; }
+            50% { transform: scale(0.92) rotate(1.5deg); opacity: 0.65; }
+            100% { transform: scale(1.05) rotate(-1deg); opacity: 0.92; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .title {
+            font-family: 'Creepster', cursive;
+            font-size: 3rem;
+            text-align: center;
+            color: #d4af37;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+            margin-bottom: 10px;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 3px 3px 6px rgba(0,0,0,0.7), 0 0 20px rgba(212, 175, 55, 0.3); }
+            to { text-shadow: 3px 3px 6px rgba(0,0,0,0.7), 0 0 30px rgba(212, 175, 55, 0.6); }
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #b8860b;
+        }
+        
+        .game-screen {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+        
+        .game-screen.active {
+            display: block;
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .start-screen {
+            text-align: center;
+        }
+        
+        .story-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            text-align: justify;
+            background: linear-gradient(45deg, rgba(245, 245, 220, 0.95) 0%, rgba(255, 248, 220, 0.9) 100%);
+            color: #2c1810;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid #8b4513;
+            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.3), 0 4px 15px rgba(0,0,0,0.4);
+            position: relative;
+            font-family: 'Crimson Text', serif;
+        }
+        
+        .story-text::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #8b4513, #d4af37, #8b4513);
+            border-radius: 18px;
+            z-index: -1;
+        }
+        
+        .story-text::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 24px,
+                rgba(139, 69, 19, 0.1) 25px
+            );
+            pointer-events: none;
+            border-radius: 10px;
+        }
+        
+        .room-title {
+            font-family: 'Creepster', cursive;
+            font-size: 2rem;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        
+        .passage {
+            background: linear-gradient(45deg, rgba(245, 245, 220, 0.95) 0%, rgba(255, 248, 220, 0.9) 100%);
+            color: #2c1810;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 3px solid #8b4513;
+            box-shadow: inset 0 0 20px rgba(139, 69, 19, 0.3), 0 4px 15px rgba(0,0,0,0.4);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            position: relative;
+        }
+        
+        .passage::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #8b4513, #d4af37, #8b4513);
+            border-radius: 18px;
+            z-index: -1;
+        }
+        
+        .passage::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 24px,
+                rgba(139, 69, 19, 0.1) 25px
+            );
+            pointer-events: none;
+            border-radius: 10px;
+        }
+        
+        .question {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid #d4af37;
+        }
+        
+        .question h3 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .option {
+            background: rgba(139, 69, 19, 0.3);
+            padding: 12px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .option:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: #d4af37;
+            transform: translateX(5px);
+        }
+        
+        .option.selected {
+            background: rgba(212, 175, 55, 0.4);
+            border-color: #d4af37;
+        }
+        
+        .option.correct {
+            background: rgba(0, 128, 0, 0.3);
+            border-color: #00ff00;
+        }
+        
+        .option.incorrect {
+            background: rgba(128, 0, 0, 0.3);
+            border-color: #ff0000;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #8b4513, #d4af37);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-family: 'Crimson Text', serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .clue-found {
+            background: rgba(0, 128, 0, 0.2);
+            border: 2px solid #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
+        
+        /* Visual Clue Popup */
+        .clue-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(45deg, rgba(245, 245, 220, 0.98) 0%, rgba(255, 248, 220, 0.95) 100%);
+            border: 5px solid #8b4513;
+            border-radius: 20px;
+            padding: 30px;
+            z-index: 1000;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(139, 69, 19, 0.3);
+            max-width: 400px;
+            text-align: center;
+            animation: cluePopIn 0.8s ease-out forwards;
+        }
+        
+        .clue-popup::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            background: linear-gradient(45deg, #8b4513, #d4af37, #8b4513, #d4af37);
+            border-radius: 25px;
+            z-index: -1;
+            animation: borderGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes cluePopIn {
+            0% { 
+                transform: translate(-50%, -50%) scale(0) rotate(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes borderGlow {
+            0% { filter: brightness(1) drop-shadow(0 0 10px rgba(212, 175, 55, 0.5)); }
+            100% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(212, 175, 55, 0.8)); }
+        }
+        
+        .clue-image {
+            width: 300px;
+            height: 200px;
+            margin: 15px auto;
+            border: 3px solid #8b4513;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            background: #f5f5dc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            position: relative;
+            overflow: hidden;
+            padding: 5px;
+        }
+        
+        .clue-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 7px;
+            background: rgba(245, 245, 220, 0.9);
+        }
+        
+        .clue-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s ease-in-out;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .clue-title {
+            color: #8b4513;
+            font-family: 'Creepster', cursive;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .clue-description {
+            color: #2c1810;
+            font-family: 'Crimson Text', serif;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        
+        .clue-close-btn {
+            background: linear-gradient(45deg, #8b4513, #d4af37);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Crimson Text', serif;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .clue-close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Warning Popup Styles */
+        .warning-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(45deg, rgba(245, 245, 220, 0.98) 0%, rgba(255, 248, 220, 0.95) 100%);
+            border: 5px solid #ff6347;
+            border-radius: 20px;
+            padding: 30px;
+            z-index: 1000;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.5), inset 0 0 30px rgba(255, 99, 71, 0.3);
+            max-width: 450px;
+            text-align: center;
+            animation: warningPopIn 0.8s ease-out forwards;
+        }
+
+        .warning-popup::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            background: linear-gradient(45deg, #ff6347, #ff0000, #ff6347, #ff0000);
+            border-radius: 25px;
+            z-index: -1;
+            animation: warningBorderGlow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes warningPopIn {
+            0% { 
+                transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes warningBorderGlow {
+            0% { filter: brightness(1) drop-shadow(0 0 15px rgba(255, 99, 71, 0.6)); }
+            100% { filter: brightness(1.3) drop-shadow(0 0 25px rgba(255, 0, 0, 0.8)); }
+        }
+
+        .warning-title {
+            font-family: 'Creepster', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: warningPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes warningPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .warning-content {
+            color: #2c1810;
+            font-family: 'Crimson Text', serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin: 20px 0;
+        }
+
+        .warning-stats {
+            background: rgba(255, 165, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ffa500;
+            margin: 15px 0;
+        }
+
+        .warning-close-btn {
+            background: linear-gradient(45deg, #ff6347, #ff0000);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-family: 'Crimson Text', serif;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .warning-close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+            background: linear-gradient(45deg, #ff0000, #ff6347);
+        }
+        
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            opacity: 0;
+            animation: fadeInOverlay 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeInOverlay {
+            to { opacity: 1; }
+        }
+        
+        .clue-item {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            border-left: 3px solid #d4af37;
+        }
+        
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.5);
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #8b4513, #d4af37);
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .manor-map {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+            perspective: 1000px;
+        }
+        
+        .room-button {
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.8) 0%, rgba(101, 50, 15, 0.9) 100%);
+            border: 3px solid #8b4513;
+            color: #f4f1de;
+            padding: 25px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            font-family: 'Crimson Text', serif;
+            font-size: 1.1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+        }
+        
+        .room-button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.4s ease;
+            z-index: 1;
+        }
+        
+        .room-button::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 10px;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .room-button .room-emoji {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 8px;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+            position: relative;
+            z-index: 3;
+        }
+        
+        .room-button .room-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 3;
+        }
+        
+        .room-button .room-status {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-style: italic;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .room-button:hover:not(.locked) {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.6) 0%, rgba(184, 134, 11, 0.8) 100%);
+            border-color: #d4af37;
+            transform: translateY(-5px) rotateX(5deg);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .room-button:hover:not(.locked)::before {
+            transform: scale(1);
+        }
+        
+        .room-button.completed {
+            background: linear-gradient(135deg, rgba(0, 128, 0, 0.6) 0%, rgba(0, 100, 0, 0.8) 100%);
+            border-color: #00ff00;
+            box-shadow: 0 8px 20px rgba(0, 255, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        .room-button.completed::after {
+            border-color: rgba(0, 255, 0, 0.5);
+        }
+        
+        .room-button.completed .room-status::after {
+            content: ' ✓';
+            color: #00ff00;
+            font-weight: bold;
+        }
+        
+        .room-button.locked {
+            background: linear-gradient(135deg, rgba(60, 60, 60, 0.6) 0%, rgba(40, 40, 40, 0.8) 100%);
+            border-color: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .room-button.locked::after {
+            border-color: rgba(102, 102, 102, 0.3);
+        }
+        
+        .room-button.locked .room-emoji {
+            filter: grayscale(100%) drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        
+        .room-button.locked .room-status::before {
+            content: '🔒 ';
+        }
+        
+
+
+        .game-info, .player-form {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid #8b4513;
+        }
+
+        .info-text {
+            background: linear-gradient(45deg, rgba(245, 245, 220, 0.95) 0%, rgba(255, 248, 220, 0.9) 100%);
+            color: #2c1810;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .info-text ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        .info-text li {
+            margin-bottom: 8px;
+        }
+
+        .results-summary {
+            display: grid;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .player-stats, .performance-stats {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #8b4513;
+        }
+
+        .grade-display {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #d4af37;
+            text-align: center;
+        }
+
+        .lives-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ff4444;
+            display: inline-block;
+        }
+        
+
+        
+        /* Real Typewriter Effect for Intro Only */
+        .intro-screen .story-text p {
+            opacity: 0;
+            display: none;
+        }
+        
+        .typewriter-paragraph {
+            opacity: 1 !important;
+            display: block !important;
+            overflow: hidden;
+            border-right: 2px solid #d4af37;
+            white-space: nowrap;
+            margin: 0 0 15px 0;
+            font-family: 'Crimson Text', serif;
+            color: #2c1810;
+            width: 0;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        .typewriter-paragraph.typing-complete {
+            border-right: none;
+            white-space: normal;
+            overflow: visible;
+            width: auto;
+            animation: none;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #d4af37; }
+        }
+        
+        .typewriter-button {
+            opacity: 0;
+            animation: fadeInButton 0.8s ease-in forwards;
+        }
+        
+        @keyframes fadeInButton {
+            from { 
+                opacity: 0; 
+                transform: scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1); 
+            }
+        }
+
+        /* Ambient Sound Visualization */
+        .sound-wave {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 100px;
+            height: 30px;
+            display: flex;
+            align-items: end;
+            gap: 2px;
+            z-index: 5;
+            opacity: 0.6;
+        }
+        
+        .sound-bar {
+            width: 3px;
+            background: #d4af37;
+            border-radius: 2px;
+            animation: soundWave 2s ease-in-out infinite;
+        }
+        
+        .sound-bar:nth-child(1) { animation-delay: 0s; height: 10px; }
+        .sound-bar:nth-child(2) { animation-delay: 0.1s; height: 15px; }
+        .sound-bar:nth-child(3) { animation-delay: 0.2s; height: 8px; }
+        .sound-bar:nth-child(4) { animation-delay: 0.3s; height: 20px; }
+        .sound-bar:nth-child(5) { animation-delay: 0.4s; height: 12px; }
+        .sound-bar:nth-child(6) { animation-delay: 0.5s; height: 18px; }
+        .sound-bar:nth-child(7) { animation-delay: 0.6s; height: 6px; }
+        .sound-bar:nth-child(8) { animation-delay: 0.7s; height: 14px; }
+        
+        @keyframes soundWave {
+            0%, 100% { transform: scaleY(0.3); }
+            50% { transform: scaleY(1); }
+        }
+        
+        .final-deduction {
+            background: rgba(128, 0, 0, 0.2);
+            border: 2px solid #ff4444;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .clue-list {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .draggable-clue {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: move;
+            border: 1px solid #d4af37;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .draggable-clue:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        .draggable-clue.dragging {
+            opacity: 0.7;
+            transform: rotate(5deg) scale(1.05);
+            z-index: 1000;
+        }
+        
+        .draggable-clue.in-drop-zone {
+            background: rgba(0, 128, 0, 0.2);
+            border-color: #00ff00;
+            cursor: pointer;
+        }
+        
+        .draggable-clue.in-drop-zone:hover {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+        
+        .drop-zone {
+            min-height: 60px;
+            border: 2px dashed #d4af37;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4af37;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone.drag-over {
+            background: rgba(212, 175, 55, 0.2);
+            border-style: solid;
+        }
+        
+        .ending {
+            text-align: center;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: linear-gradient(45deg, rgba(245, 245, 220, 0.95) 0%, rgba(255, 248, 220, 0.9) 100%);
+            border: 3px solid #8b4513;
+        }
+        
+        .ending::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: linear-gradient(45deg, #8b4513, #d4af37, #8b4513);
+            border-radius: 25px;
+            z-index: -2;
+        }
+        
+        .ending::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 24px,
+                rgba(139, 69, 19, 0.1) 25px
+            );
+            pointer-events: none;
+            border-radius: 15px;
+            z-index: -1;
+        }
+        
+        .parchment-image {
+            width: 100%;
+            max-width: 400px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin: 20px auto;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            border: 3px solid #8b4513;
+        }
+        
+        .ending::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.03) 1deg, transparent 2deg);
+            animation: endingRotate 20s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes endingRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+
+        
+        .ending-title-enhanced {
+            font-family: 'Creepster', cursive;
+            font-size: 2.5rem;
+            margin: 30px 0 20px 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
+            position: relative;
+            z-index: 2;
+            color: #8b4513;
+        }
+        
+        .ending-content-enhanced {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 20px 0;
+            position: relative;
+            z-index: 2;
+            color: #2c1810;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: justify;
+        }
+        
+        .ending-status-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(45deg, #8b4513, #d4af37);
+            color: #f4f1de;
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+            border: 2px solid #8b4513;
+        }
+
+        /* New Room Layout Styles */
+        .room-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .room-image-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .room-image-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px solid #8b4513;
+        }
+
+        .room-image {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.8);
+        }
+
+        .questions-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #8b4513;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .question-container {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .question {
+            display: none;
+            animation: questionSlideIn 0.5s ease-in-out;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        @keyframes questionSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question h3 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #f4f1de;
+            line-height: 1.6;
+        }
+
+        .question-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #8b4513;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .room-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .room-image {
+                height: 250px;
+            }
+            
+            .question-navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .manor-map {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="parallax-bg"></div>
+    <div class="rain"></div>
+    <div class="lightning"></div>
+    <div class="candle-glow"></div>
+    <div class="candle-left"></div>
+    <div class="candle-bottom"></div>
+    
+    <!-- Ambient Sound Visualization -->
+    <div class="sound-wave">
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+        <div class="sound-bar"></div>
+    </div>
+    
+    <div class="container">
+        <h1 class="title">Mystery at Ravenwood Manor</h1>
+        <p class="subtitle">A Victorian Mystery Adventure</p>
+        
+        <!-- Homepage -->
+        <div id="homepage" class="game-screen active start-screen">
+            <div class="manor-image">
+                <img src="https://i.ibb.co/jkDYp1C8/manor.jpg" 
+                     alt="Ravenwood Manor - A dark Victorian mansion against stormy skies" 
+                     onerror="this.src=''; this.alt='Manor image failed to load'; this.style.display='none';"
+                     style="width: 100%; max-width: 800px; height: auto; max-height: 500px; object-fit: contain; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); background: rgba(0,0,0,0.3); padding: 10px;">
+            </div>
+            
+            <div class="game-info">
+                <h3 style="color: #d4af37; margin-bottom: 20px; font-family: 'Creepster', cursive;">🎭 About This Game</h3>
+                <div class="info-text">
+                    <p>You are a <strong>renowned detective</strong> who has been summoned to investigate the mysterious disappearance at <strong>Ravenwood Manor</strong>. This interactive Victorian mystery adventure combines your detective skills with careful reading comprehension!</p>
+                    
+                    <p><strong>🕵️ Your Mission:</strong> A wealthy manor owner has vanished under suspicious circumstances. The local authorities are baffled, and you've been called in as their last hope. Armed with your keen observation skills and analytical mind, you must uncover the truth hidden within the manor's dark corridors.</p>
+                    
+                    <p><strong>🎯 How to Play:</strong></p>
+                    <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                        <li>Explore 6 mysterious rooms in the haunted manor</li>
+                        <li>Read atmospheric passages and answer comprehension questions</li>
+                        <li>You must answer <strong>ALL questions correctly</strong> to find clues</li>
+                        <li>You have <strong>3 lives</strong> - lose all lives and it's game over!</li>
+                        <li>Collect all 6 clues to unlock the final room</li>
+                        <li>Solve the mystery by arranging clues and identifying the culprit</li>
+                    </ul>
+                    
+                    <p><strong>⚠️ Warning:</strong> This game requires careful reading and critical thinking. Each wrong answer costs you a life!</p>
+                </div>
+            </div>
+            
+            <div class="player-form">
+                <h3 style="color: #d4af37; margin-bottom: 15px;">👤 Player Information</h3>
+                <div style="display: grid; gap: 15px; max-width: 400px; margin: 0 auto;">
+                    <input type="text" id="player-name" placeholder="Enter your name" 
+                           style="padding: 12px; border-radius: 8px; border: 2px solid #8b4513; background: rgba(245, 245, 220, 0.9); color: #2c1810; font-family: 'Crimson Text', serif; font-size: 1rem;">
+                    <input type="text" id="player-class" placeholder="Enter your class/grade" 
+                           style="padding: 12px; border-radius: 8px; border: 2px solid #8b4513; background: rgba(245, 245, 220, 0.9); color: #2c1810; font-family: 'Crimson Text', serif; font-size: 1rem;">
+                </div>
+            </div>
+            
+            <button class="btn" onclick="showIntro()" id="start-btn" disabled>Begin Your Investigation</button>
+            <p style="font-size: 0.9rem; color: #b8860b; margin-top: 10px;">Please enter your name and class to continue</p>
+        </div>
+
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="game-screen start-screen">
+            <div class="manor-image">
+                <img src="https://i.ibb.co/jkDYp1C8/manor.jpg" 
+                     alt="Ravenwood Manor - A dark Victorian mansion against stormy skies" 
+                     onerror="this.src=''; this.alt='Manor image failed to load'; this.style.display='none';"
+                     style="width: 100%; max-width: 800px; height: auto; max-height: 500px; object-fit: contain; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); background: rgba(0,0,0,0.3); padding: 10px;">
+            </div>
+            <div class="story-text">
+                <p id="intro-p1">The storm rages outside as your carriage pulls up to the imposing silhouette of Ravenwood Manor...</p>
+                <p id="intro-p2">Lightning illuminates the Gothic spires and gargoyles that seem to watch your every move. You were invited here for a weekend gathering, but something feels terribly wrong...</p>
+                <p id="intro-p3">The front door creaks open before you can knock. Inside, candles flicker in the drafty hallways, casting dancing shadows on the walls. Your host is nowhere to be found, and the other guests seem... suspicious.</p>
+                <p id="intro-p4">As thunder crashes overhead, you realize the bridge has been washed out. You're trapped here until the storm passes. But strange things are happening in this manor, and you must uncover the truth before it's too late.</p>
+            </div>
+            
+            <button class="btn typewriter-button" onclick="startGame()" id="enter-manor-btn" style="opacity: 0;">Enter the Manor</button>
+        </div>
+        
+        <!-- Map Screen -->
+        <div id="map-screen" class="game-screen">
+            <h2 class="room-title">Ravenwood Manor</h2>
+            <div class="player-info">
+                <p style="text-align: center; margin-bottom: 10px; color: #d4af37;">
+                    <strong>Detective:</strong> <span id="display-name">Unknown</span> | 
+                    <strong>Class:</strong> <span id="display-class">Unknown</span>
+                </p>
+                <div class="lives-display" style="text-align: center; margin-bottom: 15px;">
+                    <span style="color: #ff4444; font-size: 1.2rem;">❤️ Lives: </span>
+                    <span id="lives-hearts" style="font-size: 1.5rem;">❤️❤️❤️</span>
+                    <span id="lives-count" style="color: #ff4444; font-weight: bold; margin-left: 10px;">3/3</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+            <p style="text-align: center; margin-bottom: 20px;">Clues Found: <span id="clue-count">0</span>/6</p>
+            
+            <div class="manor-map">
+                <div class="room-button" onclick="enterRoom('hallway')">
+                    <span class="room-emoji">🕯️</span>
+                    <div class="room-name">Hallway</div>
+                    <div class="room-status">Prologue</div>
+                </div>
+                <div class="room-button locked" id="library-btn">
+                    <span class="room-emoji">📚</span>
+                    <div class="room-name">Library</div>
+                    <div class="room-status">Locked</div>
+                </div>
+                <div class="room-button locked" id="conservatory-btn">
+                    <span class="room-emoji">🌿</span>
+                    <div class="room-name">Conservatory</div>
+                    <div class="room-status">Locked</div>
+                </div>
+                <div class="room-button locked" id="kitchen-btn">
+                    <span class="room-emoji">🔥</span>
+                    <div class="room-name">Kitchen</div>
+                    <div class="room-status">Locked</div>
+                </div>
+                <div class="room-button locked" id="attic-btn">
+                    <span class="room-emoji">📦</span>
+                    <div class="room-name">Attic</div>
+                    <div class="room-status">Locked</div>
+                </div>
+                <div class="room-button locked" id="basement-btn">
+                    <span class="room-emoji">🔒</span>
+                    <div class="room-name">Basement</div>
+                    <div class="room-status">Locked</div>
+                </div>
+                <div class="room-button locked" id="study-btn" style="grid-column: 2;">
+                    <span class="room-emoji">🎯</span>
+                    <div class="room-name">Study</div>
+                    <div class="room-status">Final Room</div>
+                </div>
+            </div>
+            
+            <div id="clues-collected">
+                <h3 style="color: #d4af37; margin-bottom: 15px;">Clues Collected:</h3>
+                <div id="clue-list"></div>
+            </div>
+        </div>
+        
+        <!-- Room Screens -->
+        <div id="hallway-screen" class="game-screen">
+            <h2 class="room-title">The Grand Hallway</h2>
+            
+            <div class="passage">
+                <div class="room-image-container" style="float: right; width: 300px; margin: 0 0 15px 20px;">
+                    <img src="https://i.ibb.co/KjqK9KS6/hallway.jpg" 
+                         alt="Dark Victorian hallway with ornate architecture" 
+                         onerror="this.src=''; this.alt='Hallway image failed to load'; this.style.display='none';"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #8b4513;">
+                </div>
+                
+                <p>The grand hallway of Ravenwood Manor stretches before you like a cathedral of shadows. Portraits of stern-faced ancestors line the walls, their eyes seeming to follow your movement through the flickering candlelight. The marble floor, once pristine, now bears the scuff marks of hurried footsteps and something that looks suspiciously like dried blood near the base of the grand staircase.</p>
+                
+                <p>A grandfather clock in the corner has stopped at precisely 11:15, its pendulum hanging motionless. The air carries the scent of old roses and something else—something metallic and unsettling. On a small table near the entrance, you notice a guest registry book lies open, but several pages appear to have been hastily torn out.</p>
+                
+                <p>Thunder crashes outside, and in that brief moment of illumination through the tall windows, you catch sight of a figure moving quickly across the upper landing before disappearing into the shadows.</p>
+                
+                <div style="clear: both;"></div>
+            </div>
+            
+            <div class="questions-section" style="margin-top: 20px;">
+                <div class="question-container">
+                    <div class="question active" id="hallway-q1">
+                        <h3>Question 1 of 3</h3>
+                        <p class="question-text">What is the main atmosphere created in this passage?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 0)">Welcoming and warm</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 0)">Mysterious and foreboding</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'hallway', 0)">Eerie and suspicious</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 0)">Peaceful and serene</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="hallway-q2">
+                        <h3>Question 2 of 3</h3>
+                        <p class="question-text">What time is shown on the grandfather clock?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 1)">10:15</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'hallway', 1)">11:15</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 1)">12:15</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 1)">The clock is not mentioned</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="hallway-q3">
+                        <h3>Question 3 of 3</h3>
+                        <p class="question-text">Which of these details suggests something sinister has occurred?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 2)">The flickering candlelight</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'hallway', 2)">The dried blood near the staircase</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 2)">The scent of old roses</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'hallway', 2)">The tall windows</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-navigation">
+                    <button class="btn nav-btn" id="hallway-prev" onclick="previousQuestion('hallway')" disabled>← Previous</button>
+                    <button class="btn nav-btn" id="hallway-next" onclick="nextQuestion('hallway')" disabled>Next →</button>
+                    <button class="btn" id="hallway-submit" onclick="checkAnswers('hallway')" style="display: none;" disabled>Submit All Answers</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="returnToMap()" style="display: none;" id="hallway-return">Return to Map</button>
+        </div>
+        
+        <!-- Library Screen -->
+        <div id="library-screen" class="game-screen">
+            <div class="library-candles">
+                <div class="room-candle"></div>
+                <div class="room-candle"></div>
+                <div class="room-candle"></div>
+            </div>
+            <h2 class="room-title">The Library</h2>
+            
+            <div class="passage">
+                <div class="room-image-container" style="float: right; width: 300px; margin: 0 0 15px 20px;">
+                    <img src="https://i.ibb.co/d0DfHHs9/library.jpg" 
+                         alt="Victorian library with towering bookshelves" 
+                         onerror="this.src=''; this.alt='Library image failed to load'; this.style.display='none';"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #8b4513;">
+                </div>
+                
+                <p><em>From the diary found on the desk:</em></p>
+                <p>"October 13th - I cannot sleep. The whispers in the walls grow louder each night, and I fear my secret meetings with M. have been discovered. Tonight, when the clock strikes midnight, I must retrieve the evidence from its hiding place. If anyone reads this, know that the truth lies where knowledge sleeps eternal, guarded by the wisdom of ages. The key to everything is hidden in plain sight, yet invisible to those who seek with greed rather than understanding."</p>
+                
+                <p>The leather-bound diary trembles in your hands as you read these words by the light of a single candle. Around you, towering bookshelves stretch toward the vaulted ceiling, their contents shrouded in dust and mystery. A broken pocket watch lies beside the diary, its hands frozen at 11:15—the same time as the grandfather clock in the hallway.</p>
+                
+                <div style="clear: both;"></div>
+            </div>
+            
+            <div class="questions-section" style="margin-top: 20px;">
+                <div class="question-container">
+                    <div class="question active" id="library-q1">
+                        <h3>Question 1 of 3</h3>
+                        <p class="question-text">Who was the diary writer planning to meet?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 0)">A person whose name starts with L</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'library', 0)">A person whose name starts with M</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 0)">Multiple people</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 0)">The text doesn't specify</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="library-q2">
+                        <h3>Question 2 of 3</h3>
+                        <p class="question-text">What does "knowledge sleeps eternal" most likely refer to?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 1)">A bedroom</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'library', 1)">A library or place of learning</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 1)">A graveyard</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 1)">A basement</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="library-q3">
+                        <h3>Question 3 of 3</h3>
+                        <p class="question-text">The phrase "hidden in plain sight" is an example of:</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 2)">A simile</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 2)">A metaphor</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'library', 2)">A paradox</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'library', 2)">Alliteration</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-navigation">
+                    <button class="btn nav-btn" id="library-prev" onclick="previousQuestion('library')" disabled>← Previous</button>
+                    <button class="btn nav-btn" id="library-next" onclick="nextQuestion('library')" disabled>Next →</button>
+                    <button class="btn" id="library-submit" onclick="checkAnswers('library')" style="display: none;" disabled>Submit All Answers</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="returnToMap()" style="display: none;" id="library-return">Return to Map</button>
+        </div>
+        
+        <!-- Conservatory Screen -->
+        <div id="conservatory-screen" class="game-screen">
+            <h2 class="room-title">The Conservatory</h2>
+            
+            <div class="passage">
+                <div class="room-image-container" style="float: right; width: 300px; margin: 0 0 15px 20px;">
+                    <img src="https://i.ibb.co/nNmff8Z5/conservatory.jpg" 
+                         alt="Victorian conservatory with overgrown plants" 
+                         onerror="this.src=''; this.alt='Conservatory image failed to load'; this.style.display='none';"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #8b4513;">
+                </div>
+                
+                <p><em>Letter found among the overgrown plants:</em></p>
+                <p>"My Dear Sister, I write this in haste as I fear I have witnessed something terrible. Last evening, while tending to the orchids, I overheard a heated argument between the master and someone whose voice I did not recognize. The stranger spoke of 'settling old debts' and mentioned something about 'the midnight hour.' I saw a figure in a dark coat fleeing through the garden, leaving behind a single leather glove stained with what appeared to be ink—or something darker. I dare not speak of this to anyone, but I have hidden this letter where only you might find it. Trust no one, dear Margaret. The very walls of this manor seem to harbor secrets that could destroy us all."</p>
+                
+                <div style="clear: both;"></div>
+            </div>
+            
+            <div class="questions-section" style="margin-top: 20px;">
+                <div class="question-container">
+                    <div class="question active" id="conservatory-q1">
+                        <h3>Question 1 of 3</h3>
+                        <p class="question-text">In what order did these events occur?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 0)">Argument → Letter writing → Glove discovery → Figure fleeing</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'conservatory', 0)">Argument → Figure fleeing → Glove discovery → Letter writing</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 0)">Glove discovery → Argument → Figure fleeing → Letter writing</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 0)">Letter writing → Argument → Glove discovery → Figure fleeing</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="conservatory-q2">
+                        <h3>Question 2 of 3</h3>
+                        <p class="question-text">What synonym best replaces "harbor" in "harbor secrets"?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 1)">Release</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'conservatory', 1)">Conceal</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 1)">Destroy</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 1)">Create</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="conservatory-q3">
+                        <h3>Question 3 of 3</h3>
+                        <p class="question-text">The tone of this letter is:</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 2)">Cheerful and optimistic</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 2)">Angry and accusatory</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'conservatory', 2)">Fearful and urgent</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'conservatory', 2)">Calm and informative</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-navigation">
+                    <button class="btn nav-btn" id="conservatory-prev" onclick="previousQuestion('conservatory')" disabled>← Previous</button>
+                    <button class="btn nav-btn" id="conservatory-next" onclick="nextQuestion('conservatory')" disabled>Next →</button>
+                    <button class="btn" id="conservatory-submit" onclick="checkAnswers('conservatory')" style="display: none;" disabled>Submit All Answers</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="returnToMap()" style="display: none;" id="conservatory-return">Return to Map</button>
+        </div>
+        
+        <!-- Kitchen Screen -->
+        <div id="kitchen-screen" class="game-screen">
+            <h2 class="room-title">The Kitchen</h2>
+            
+            <div class="passage">
+                <div class="room-image-container" style="float: right; width: 300px; margin: 0 0 15px 20px;">
+                    <img src="https://i.ibb.co/674V3sg4/kitchen.jpg" 
+                         alt="Victorian kitchen with old fireplace" 
+                         onerror="this.src=''; this.alt='Kitchen image failed to load'; this.style.display='none';"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #8b4513;">
+                </div>
+                
+                <p><em>Partially burned note retrieved from the fireplace:</em></p>
+                <p>"...must warn you that it is not safe after midnight. The master has discovered our correspondence and grows suspicious of our... [burned section] ...meet me in the study when the clock strikes eleven-fifteen. Bring the evidence we discussed, and we shall put an end to this madness once and for all. If you are reading this and I have not returned by dawn, look for the truth in the place where shadows dance with flame. Destroy this message immediately after reading. Time is running short, and I fear..."</p>
+                <p><em>[The rest of the note has been consumed by flames]</em></p>
+                
+                <div style="clear: both;"></div>
+            </div>
+            
+            <div class="questions-section" style="margin-top: 20px;">
+                <div class="question-container">
+                    <div class="question active" id="kitchen-q1">
+                        <h3>Question 1 of 3</h3>
+                        <p class="question-text">What was the writer's main purpose in writing this note?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 0)">To invite someone to dinner</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'kitchen', 0)">To warn someone and arrange a secret meeting</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 0)">To confess to a crime</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 0)">To give cooking instructions</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="kitchen-q2">
+                        <h3>Question 2 of 3</h3>
+                        <p class="question-text">Which sentence corrects the tense error in: "If you are reading this and I have not returned by dawn, look for the truth"?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 1)">If you read this and I had not returned by dawn, look for the truth</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'kitchen', 1)">If you are reading this and I have not returned by dawn, look for the truth</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 1)">If you will read this and I have not returned by dawn, looked for the truth</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 1)">There is no tense error in the original sentence</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="kitchen-q3">
+                        <h3>Question 3 of 3</h3>
+                        <p class="question-text">Which sentence best summarizes the note's content?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 2)">Someone is planning a surprise party in the study</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'kitchen', 2)">Someone is warning about danger and arranging a secret meeting with evidence</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 2)">Someone is confessing to burning important documents</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'kitchen', 2)">Someone is giving directions to find hidden treasure</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-navigation">
+                    <button class="btn nav-btn" id="kitchen-prev" onclick="previousQuestion('kitchen')" disabled>← Previous</button>
+                    <button class="btn nav-btn" id="kitchen-next" onclick="nextQuestion('kitchen')" disabled>Next →</button>
+                    <button class="btn" id="kitchen-submit" onclick="checkAnswers('kitchen')" style="display: none;" disabled>Submit All Answers</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="returnToMap()" style="display: none;" id="kitchen-return">Return to Map</button>
+        </div>
+        
+        <!-- Attic Screen -->
+        <div id="attic-screen" class="game-screen">
+            <h2 class="room-title">The Attic</h2>
+            
+            <div class="passage">
+                <div class="room-image-container" style="float: right; width: 300px; margin: 0 0 15px 20px;">
+                    <img src="https://i.ibb.co/GfHfkHf6/attic.jpg" 
+                         alt="Dusty Victorian attic with old trunks" 
+                         onerror="this.src=''; this.alt='Attic image failed to load'; this.style.display='none';"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #8b4513;">
+                </div>
+                
+                <p>Dust motes dance like tiny spirits in the pale moonlight filtering through the grimy attic window. Cobwebs drape the rafters like funeral shrouds, and the floorboards creak ominously beneath your feet. In the corner sits an ancient trunk, its brass fittings green with age. Upon opening it, you discover a false bottom containing old photographs and a hidden compartment.</p>
+                
+                <p>The photographs show the manor's previous owners, but one image catches your attention—a group photo with one face deliberately scratched out. Beneath the photos lies an ornate key, its metal surface engraved with the word "Study" in elegant script. The key feels as cold as winter's breath against your palm, and you sense it holds the power to unlock more than just a door.</p>
+                
+                <div style="clear: both;"></div>
+            </div>
+            
+            <div class="questions-section" style="margin-top: 20px;">
+                <div class="question-container">
+                    <div class="question active" id="attic-q1">
+                        <h3>Question 1 of 3</h3>
+                        <p class="question-text">"Cobwebs drape the rafters like funeral shrouds" is an example of:</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, true, 'attic', 0)">A simile</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 0)">A metaphor</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 0)">Personification</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 0)">Alliteration</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="attic-q2">
+                        <h3>Question 2 of 3</h3>
+                        <p class="question-text">Which detail suggests someone wanted to hide a person's identity?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 1)">The false bottom in the trunk</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'attic', 1)">One face deliberately scratched out in a photo</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 1)">The key engraved with "Study"</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 1)">The grimy attic window</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="attic-q3">
+                        <h3>Question 3 of 3</h3>
+                        <p class="question-text">Transform this sentence to passive voice: "You discover a false bottom containing old photographs."</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 2)">Old photographs are containing a false bottom discovered by you</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'attic', 2)">A false bottom containing old photographs is discovered by you</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 2)">You are discovered by a false bottom containing old photographs</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'attic', 2)">A false bottom is containing old photographs discovered</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-navigation">
+                    <button class="btn nav-btn" id="attic-prev" onclick="previousQuestion('attic')" disabled>← Previous</button>
+                    <button class="btn nav-btn" id="attic-next" onclick="nextQuestion('attic')" disabled>Next →</button>
+                    <button class="btn" id="attic-submit" onclick="checkAnswers('attic')" style="display: none;" disabled>Submit All Answers</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="returnToMap()" style="display: none;" id="attic-return">Return to Map</button>
+        </div>
+        
+        <!-- Basement Screen -->
+        <div id="basement-screen" class="game-screen">
+            <h2 class="room-title">The Basement</h2>
+            
+            <div class="passage">
+                <div class="room-image-container" style="float: right; width: 300px; margin: 0 0 15px 20px;">
+                    <img src="https://i.ibb.co/35YNZY4R/basement.jpg" 
+                         alt="Dark Victorian basement with stone walls" 
+                         onerror="this.src=''; this.alt='Basement image failed to load'; this.style.display='none';"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #8b4513;">
+                </div>
+                
+                <p><em>Security log book found on a damp table:</em></p>
+                <p><strong>October 10th, 11:00 PM</strong> - Unusual sounds from the study. Investigated but found nothing.<br>
+                <strong>October 11th, 11:15 PM</strong> - Master requested no disturbances after 11 PM. All staff dismissed early.<br>
+                <strong>October 12th, 10:45 PM</strong> - Stranger arrived via the garden entrance. Did not use main door.<br>
+                <strong>October 13th, 11:15 PM</strong> - Loud argument heard from study. Master shouted "You'll never get away with this!"<br>
+                <strong>October 13th, 11:30 PM</strong> - Silence. Master did not respond to dinner call.<br>
+                <strong>October 14th, 6:00 AM</strong> - Master's bed not slept in. Study door locked from inside.</p>
+                
+                <p>Beside the logbook, you find a hand-drawn map showing a secret passage connecting the basement to the study, with a note: "Emergency exit - use only if discovered."</p>
+                
+                <div style="clear: both;"></div>
+            </div>
+            
+            <div class="questions-section" style="margin-top: 20px;">
+                <div class="question-container">
+                    <div class="question active" id="basement-q1">
+                        <h3>Question 1 of 3</h3>
+                        <p class="question-text">Match the dates to the correct events:</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 0)">Oct 10th: Argument heard, Oct 11th: Stranger arrived, Oct 12th: Unusual sounds</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'basement', 0)">Oct 10th: Unusual sounds, Oct 11th: Staff dismissed early, Oct 12th: Stranger arrived</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 0)">Oct 10th: Master missing, Oct 11th: Unusual sounds, Oct 12th: Argument heard</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 0)">Oct 10th: Staff dismissed, Oct 11th: Stranger arrived, Oct 12th: Master missing</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="basement-q2">
+                        <h3>Question 2 of 3</h3>
+                        <p class="question-text">Which entry contains a factual inconsistency with the story?</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 1)">The master requesting no disturbances</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 1)">The stranger using the garden entrance</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'basement', 1)">All entries appear factually consistent</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 1)">The study door being locked from inside</div>
+                        </div>
+                    </div>
+                    
+                    <div class="question" id="basement-q3">
+                        <h3>Question 3 of 3</h3>
+                        <p class="question-text">Correct the punctuation: "Master shouted You'll never get away with this"</p>
+                        <div class="options">
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 2)">Master shouted, "You'll never get away with this"</div>
+                            <div class="option" onclick="selectSingleOption(this, true, 'basement', 2)">Master shouted, "You'll never get away with this!"</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 2)">Master shouted: You'll never get away with this!</div>
+                            <div class="option" onclick="selectSingleOption(this, false, 'basement', 2)">Master shouted "You'll never get away with this."</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-navigation">
+                    <button class="btn nav-btn" id="basement-prev" onclick="previousQuestion('basement')" disabled>← Previous</button>
+                    <button class="btn nav-btn" id="basement-next" onclick="nextQuestion('basement')" disabled>Next →</button>
+                    <button class="btn" id="basement-submit" onclick="checkAnswers('basement')" style="display: none;" disabled>Submit All Answers</button>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="returnToMap()" style="display: none;" id="basement-return">Return to Map</button>
+        </div>
+        
+        <!-- Study Screen -->
+        <div id="study-screen" class="game-screen">
+            <div class="study-candles">
+                <div class="room-candle"></div>
+                <div class="room-candle"></div>
+                <div class="room-candle"></div>
+            </div>
+            <h2 class="room-title">The Study - Final Deduction</h2>
+            
+            <div class="passage">
+                <div class="room-image-container" style="float: right; width: 300px; margin: 0 0 15px 20px;">
+                    <img src="https://i.ibb.co/WWkkkdGy/study.jpg" 
+                         alt="Victorian study with overturned furniture" 
+                         onerror="this.src=''; this.alt='Study image failed to load'; this.style.display='none';"
+                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 2px solid #8b4513;">
+                </div>
+                
+                <p>The study door creaks open with the ornate key from the attic. Inside, the storm's fury seems to intensify, rattling the windows as if trying to break in. Lightning illuminates a scene of chaos—overturned furniture, scattered papers, and in the center of the room, a large desk with what appears to be a struggle having taken place around it.</p>
+                
+                <p>You hear footsteps approaching from the hallway. Time is running out. You must piece together all the clues you've gathered to solve the mystery of Ravenwood Manor before whoever is coming reaches you.</p>
+                
+                <div style="clear: both;"></div>
+            </div>
+            
+            <div class="final-deduction">
+                <h3>🔍 Final Deduction Challenge</h3>
+                
+                <div class="question" style="display: block; margin-bottom: 25px;">
+                    <h4 style="color: #d4af37; margin-bottom: 15px;">Question 1: What was the first event that started everything?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectFinalAnswer(this, true, 0)">📜 Someone received a torn invitation for October 13th</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 0)">⏰ The pocket watch broke at 11:15</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 0)">🧤 A glove was left in the conservatory</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 0)">🔥 Someone tried to burn evidence</div>
+                    </div>
+                </div>
+
+                <div class="question" style="display: block; margin-bottom: 25px;">
+                    <h4 style="color: #d4af37; margin-bottom: 15px;">Question 2: What happened during the confrontation?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectFinalAnswer(this, false, 1)">The master escaped through the secret passage</div>
+                        <div class="option" onclick="selectFinalAnswer(this, true, 1)">⏰ Violence occurred at exactly 11:15 PM, breaking the watch</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 1)">The maid witnessed everything from the garden</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 1)">Multiple people were involved in the fight</div>
+                    </div>
+                </div>
+
+                <div class="question" style="display: block; margin-bottom: 25px;">
+                    <h4 style="color: #d4af37; margin-bottom: 15px;">Question 3: What evidence was left behind during the escape?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectFinalAnswer(this, false, 2)">📜 The torn invitation was dropped</div>
+                        <div class="option" onclick="selectFinalAnswer(this, true, 2)">🧤 An ink-stained glove was left in the conservatory</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 2)">🗝️ The study key was abandoned</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 2)">🗺️ The secret passage map was forgotten</div>
+                    </div>
+                </div>
+
+                <div class="question" style="display: block; margin-bottom: 25px;">
+                    <h4 style="color: #d4af37; margin-bottom: 15px;">Question 4: Who is the most likely culprit?</h4>
+                    <div class="options">
+                        <div class="option" onclick="selectFinalAnswer(this, false, 3)">The missing host (Master of the house)</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 3)">Margaret (the maid's sister)</div>
+                        <div class="option" onclick="selectFinalAnswer(this, true, 3)">The mysterious stranger "M" who met secretly with someone</div>
+                        <div class="option" onclick="selectFinalAnswer(this, false, 3)">The maid who wrote the letter</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn" id="final-submit" onclick="checkFinalDeduction()" disabled>Solve the Mystery</button>
+        </div>
+        
+        <!-- Ending Screens -->
+        <div id="good-ending" class="game-screen">
+            <div class="ending">
+                <h2 class="ending-title-enhanced">🎉 Perfect Deduction!</h2>
+                <div class="ending-status-badge">Mystery Solved - Master Detective</div>
+                
+                <img src="https://i.ibb.co/NdtxJsCb/good-ending.jpg" 
+                     alt="Successful investigation - Detective with evidence" 
+                     onerror="this.style.display='none';"
+                     class="parchment-image">
+                
+                <div class="ending-content-enhanced">
+                    <p><strong>Brilliant work, detective!</strong> You've unraveled the mystery of Ravenwood Manor completely.</p>
+                    
+                    <p>The evidence clearly shows that the mysterious "M" was blackmailing the master of the house. When they met in the study at 11:15 PM on October 13th, the confrontation turned violent. The master fought back, but "M" escaped through the secret passage, leaving behind the ink-stained glove and using the torn invitation as leverage.</p>
+                    
+                    <p>As you piece together the final clues, you hear the footsteps stop outside the study door. But instead of danger, it's the local constable who has finally arrived! You present your evidence, and the mysterious "M" is apprehended trying to flee through the garden.</p>
+                    
+                    <p style="font-size: 1.2rem; color: #8b4513; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🏆 You have successfully escaped Ravenwood Manor and solved the mystery! 🏆</p>
+                </div>
+                
+                <button class="btn" onclick="downloadResults()" style="background: linear-gradient(45deg, #2c5530, #4a7c59); margin-right: 10px;">📄 Download Results</button>
+                <button class="btn" onclick="restartGame()">Play Again</button>
+            </div>
+        </div>
+        
+        <div id="partial-ending" class="game-screen">
+            <div class="ending">
+                <h2 class="ending-title-enhanced">⚠️ Partial Success</h2>
+                <div class="ending-status-badge">Partial Success - Some Mysteries Remain</div>
+                
+                <img src="https://i.ibb.co/NdtxJsCb/good-ending.jpg" 
+                     alt="Partial investigation success" 
+                     onerror="this.style.display='none';"
+                     class="parchment-image">
+                
+                <div class="ending-content-enhanced">
+                    <p>You've managed to piece together most of the mystery, but some details remain unclear.</p>
+                    
+                    <p>You correctly identified that something sinister happened in the study around 11:15 PM, and that the mysterious "M" was involved. However, without all the evidence properly arranged, you can't be certain of the exact sequence of events or the full motive.</p>
+                    
+                    <p>The footsteps in the hallway turn out to be another guest who was also investigating the strange occurrences. Together, you manage to escape the manor when the storm clears, but the mystery of what exactly happened to the master remains partially unsolved.</p>
+                    
+                    <p style="font-size: 1.2rem; color: #8b4513; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">🔍 You escaped, but the full truth of Ravenwood Manor remains hidden in shadows. 🔍</p>
+                </div>
+                
+                <button class="btn" onclick="downloadResults()" style="background: linear-gradient(45deg, #2c5530, #4a7c59); margin-right: 10px;">📄 Download Results</button>
+                <button class="btn" onclick="restartGame()">Try Again</button>
+            </div>
+        </div>
+        
+        <div id="bad-ending" class="game-screen">
+            <div class="ending">
+                <h2 class="ending-title-enhanced">💀 Trapped Forever</h2>
+                <div class="ending-status-badge">Failed Investigation - Trapped Forever</div>
+                
+                <img src="https://i.ibb.co/5XW8JNQY/bad-ending.jpg" 
+                     alt="Failed investigation - Trapped in the manor" 
+                     onerror="this.style.display='none';"
+                     class="parchment-image">
+                
+                <div class="ending-content-enhanced">
+                    <p>Your deduction was incorrect, and now it may be too late...</p>
+                    
+                    <p>As you fumble with the clues, unable to piece together the truth, the footsteps in the hallway grow closer. The door handle turns slowly, and you realize you've made a terrible mistake in your reasoning.</p>
+                    
+                    <p>The figure in the doorway is not who you expected. In your confusion, you've missed the real danger that lurks within Ravenwood Manor. The storm rages on outside, and the bridge remains washed out.</p>
+                    
+                    <p>The candles flicker and die one by one, plunging the study into darkness. The last thing you hear is the sound of the door closing and a key turning in the lock...</p>
+                    
+                    <p style="font-size: 1.2rem; color: #8b4513; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">💀 You have become another mystery of Ravenwood Manor. 💀</p>
+                </div>
+                
+                <button class="btn" onclick="showResults()">View Results</button>
+                <button class="btn" onclick="downloadResults()" style="background: linear-gradient(45deg, #2c5530, #4a7c59); margin-right: 10px;">📄 Download Results</button>
+                <button class="btn" onclick="restartGame()">Try Again</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="game-screen">
+            <div class="ending">
+                <h2 class="ending-title-enhanced">💀 Game Over</h2>
+                <div class="ending-status-badge">Game Over - Out of Lives</div>
+                
+                <img src="https://i.ibb.co/5XW8JNQY/bad-ending.jpg" 
+                     alt="Game over - Out of lives" 
+                     onerror="this.style.display='none';"
+                     class="parchment-image">
+                
+                <div class="ending-content-enhanced">
+                    <p>You have run out of lives! The mysteries of Ravenwood Manor have claimed another victim...</p>
+                    
+                    <p>The shadows close in around you as your final mistake seals your fate. The manor's secrets will remain hidden, and you have joined the ranks of those who dared to investigate but never returned.</p>
+                    
+                    <p style="font-size: 1.2rem; color: #8b4513; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">💀 Better luck next time, detective. 💀</p>
+                </div>
+                
+                <button class="btn" onclick="showResults()">View Results</button>
+                <button class="btn" onclick="downloadResults()" style="background: linear-gradient(45deg, #2c5530, #4a7c59); margin-right: 10px;">📄 Download Results</button>
+                <button class="btn" onclick="restartGame()">Try Again</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="game-screen">
+            <div class="ending" id="results-container">
+                <h2 class="ending-title-enhanced">📊 Investigation Results</h2>
+                
+                <div class="results-summary">
+                    <div class="player-stats">
+                        <h3 style="color: #d4af37; margin-bottom: 15px;">Detective Report</h3>
+                        <p><strong>Name:</strong> <span id="result-name">Unknown</span></p>
+                        <p><strong>Class:</strong> <span id="result-class">Unknown</span></p>
+                        <p><strong>Final Status:</strong> <span id="result-status">Unknown</span></p>
+                    </div>
+                    
+                    <div class="performance-stats">
+                        <h3 style="color: #d4af37; margin: 20px 0 15px;">Performance Statistics</h3>
+                        <p><strong>Clues Collected:</strong> <span id="result-clues">0</span>/6</p>
+                        <p><strong>Lives Remaining:</strong> <span id="result-lives">0</span>/3</p>
+                        <p><strong>Rooms Explored:</strong> <span id="result-rooms">0</span>/6</p>
+                        <p><strong>Final Score:</strong> <span id="result-score">0</span>/100</p>
+                    </div>
+                    
+                    <div class="grade-display">
+                        <h3 style="color: #d4af37; margin: 20px 0 15px;">Investigation Grade</h3>
+                        <div id="grade-badge" style="font-size: 3rem; font-weight: bold; text-align: center; margin: 20px 0;">
+                            F
+                        </div>
+                        <p id="grade-comment" style="text-align: center; font-style: italic;">
+                            The mysteries of Ravenwood Manor remain unsolved...
+                        </p>
+                    </div>
+                </div>
+                
+                <div id="wrong-answers-section" style="margin-top: 20px;">
+                    <h3 style="color: #ff6347; margin-bottom: 15px;">📝 Mistakes Made</h3>
+                    <div id="wrong-answers-list" style="background: rgba(128, 0, 0, 0.2); padding: 15px; border-radius: 8px; border: 1px solid #ff6347;">
+                        <!-- Wrong answers will be populated here -->
+                    </div>
+                </div>
+                
+                <div id="room-attempts-section" style="margin-top: 20px;">
+                    <h3 style="color: #d4af37; margin-bottom: 15px;">🏠 Room Attempts</h3>
+                    <div id="room-attempts-list" style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; border: 1px solid #8b4513;">
+                        <!-- Room attempts will be populated here -->
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="downloadResults()" style="background: linear-gradient(45deg, #2c5530, #4a7c59); margin-right: 10px;">📄 Download Results</button>
+                    <button class="btn" onclick="restartGame()">Play Again</button>
+                    <button class="btn" onclick="goToHomepage()">Return to Homepage</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let gameState = {
+            currentRoom: null,
+            cluesFound: 0,
+            roomsCompleted: [],
+            answers: {},
+            finalClueOrder: [],
+            selectedSuspect: null,
+            playerName: '',
+            playerClass: '',
+            lives: 3,
+            startTime: null,
+            endTime: null,
+            finalStatus: 'Unknown',
+            wrongAnswers: [],
+            roomAttempts: {},
+            totalQuestions: 0,
+            correctAnswers: 0
+        };
+        
+        // Homepage functions
+        function validatePlayerInfo() {
+            const name = document.getElementById('player-name').value.trim();
+            const playerClass = document.getElementById('player-class').value.trim();
+            const startBtn = document.getElementById('start-btn');
+            
+            if (name && playerClass) {
+                startBtn.disabled = false;
+                startBtn.nextElementSibling.style.display = 'none';
+            } else {
+                startBtn.disabled = true;
+                startBtn.nextElementSibling.style.display = 'block';
+            }
+        }
+
+        function showIntro() {
+            gameState.playerName = document.getElementById('player-name').value.trim();
+            gameState.playerClass = document.getElementById('player-class').value.trim();
+            gameState.startTime = new Date();
+            
+            document.getElementById('homepage').classList.remove('active');
+            document.getElementById('intro-screen').classList.add('active');
+            
+            // Start typewriter effect for intro paragraphs
+            startIntroTypewriter();
+        }
+        
+        function startIntroTypewriter() {
+            const paragraphs = ['intro-p1', 'intro-p2', 'intro-p3', 'intro-p4'];
+            const button = document.getElementById('enter-manor-btn');
+            let currentIndex = 0;
+            
+            function typeNextParagraph() {
+                if (currentIndex < paragraphs.length) {
+                    const paragraph = document.getElementById(paragraphs[currentIndex]);
+                    if (paragraph) {
+                        paragraph.classList.add('typewriter-paragraph');
+                        
+                        // After typing animation completes (3s), prepare for next paragraph
+                        setTimeout(() => {
+                            paragraph.classList.add('typing-complete');
+                            currentIndex++;
+                            
+                            // Start next paragraph after a brief pause
+                            setTimeout(typeNextParagraph, 500);
+                        }, 3000);
+                    }
+                } else {
+                    // All paragraphs done, show button
+                    setTimeout(() => {
+                        button.classList.add('typewriter-button');
+                    }, 500);
+                }
+            }
+            
+            // Start the first paragraph
+            typeNextParagraph();
+        }
+
+        function startGame() {
+            document.getElementById('intro-screen').classList.remove('active');
+            document.getElementById('map-screen').classList.add('active');
+            
+            // Update player info display
+            document.getElementById('display-name').textContent = gameState.playerName;
+            document.getElementById('display-class').textContent = gameState.playerClass;
+            
+            updateProgress();
+            updateLivesDisplay();
+        }
+        
+        function enterRoom(roomName) {
+    // Shuffle answers in this room
+    const roomScreen = document.getElementById(roomName + '-screen');
+    if (roomScreen) {
+        const optionGroups = roomScreen.querySelectorAll('.options');
+        optionGroups.forEach(group => {
+            const options = Array.from(group.children);
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            options.forEach(opt => group.appendChild(opt));
+        });
+    }
+
+            if (roomName === 'hallway' || gameState.roomsCompleted.includes('hallway')) {
+                gameState.currentRoom = roomName;
+                document.getElementById('map-screen').classList.remove('active');
+                document.getElementById(roomName + '-screen').classList.add('active');
+                
+                // Reset room state
+                resetRoomAnswers(roomName);
+            }
+        }
+        
+        function resetRoomAnswers(roomName) {
+            const options = document.querySelectorAll(`#${roomName}-screen .option`);
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Reset to first question
+            const questions = document.querySelectorAll(`#${roomName}-screen .question`);
+            questions.forEach((q, index) => {
+                q.classList.remove('active');
+                if (index === 0) q.classList.add('active');
+            });
+            
+            // Reset navigation buttons
+            const prevBtn = document.getElementById(`${roomName}-prev`);
+            const nextBtn = document.getElementById(`${roomName}-next`);
+            const submitBtn = document.getElementById(`${roomName}-submit`);
+            
+            if (prevBtn) prevBtn.disabled = true;
+            if (nextBtn) {
+                nextBtn.disabled = true;
+                nextBtn.style.display = 'inline-block';
+            }
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.display = 'none';
+            }
+            
+            document.getElementById(roomName + '-return').style.display = 'none';
+            
+            gameState.answers[roomName] = [];
+        }
+        
+        function selectOption(element, isCorrect) {
+            const question = element.parentElement.parentElement;
+            const options = question.querySelectorAll('.option');
+            
+            // Remove previous selection
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            
+            // Store answer
+            const roomName = gameState.currentRoom;
+            const questionIndex = Array.from(document.querySelectorAll(`#${roomName}-screen .question`)).indexOf(question);
+            
+            if (!gameState.answers[roomName]) {
+                gameState.answers[roomName] = [];
+            }
+            
+            gameState.answers[roomName][questionIndex] = isCorrect;
+            
+            // Check if all questions are answered
+            checkAllAnswered(roomName);
+        }
+
+        // New function for single question selection with navigation
+        function selectSingleOption(element, isCorrect, roomName, questionIndex) {
+            const options = element.parentElement.querySelectorAll('.option');
+            
+            // Remove previous selection
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            
+            // Store answer
+            if (!gameState.answers[roomName]) {
+                gameState.answers[roomName] = [];
+            }
+            
+            gameState.answers[roomName][questionIndex] = isCorrect;
+            
+            // Enable next button if this isn't the last question
+            const totalQuestions = document.querySelectorAll(`#${roomName}-screen .question`).length;
+            const nextBtn = document.getElementById(`${roomName}-next`);
+            const submitBtn = document.getElementById(`${roomName}-submit`);
+            
+            if (questionIndex < totalQuestions - 1) {
+                nextBtn.disabled = false;
+            } else {
+                // Last question - check if all answered
+                checkAllAnswered(roomName);
+            }
+        }
+
+        function nextQuestion(roomName) {
+            const questions = document.querySelectorAll(`#${roomName}-screen .question`);
+            const currentActive = document.querySelector(`#${roomName}-screen .question.active`);
+            const currentIndex = Array.from(questions).indexOf(currentActive);
+            
+            if (currentIndex < questions.length - 1) {
+                currentActive.classList.remove('active');
+                questions[currentIndex + 1].classList.add('active');
+                
+                // Update navigation buttons
+                updateNavigationButtons(roomName, currentIndex + 1);
+            }
+        }
+
+        function previousQuestion(roomName) {
+            const questions = document.querySelectorAll(`#${roomName}-screen .question`);
+            const currentActive = document.querySelector(`#${roomName}-screen .question.active`);
+            const currentIndex = Array.from(questions).indexOf(currentActive);
+            
+            if (currentIndex > 0) {
+                currentActive.classList.remove('active');
+                questions[currentIndex - 1].classList.add('active');
+                
+                // Update navigation buttons
+                updateNavigationButtons(roomName, currentIndex - 1);
+            }
+        }
+
+        function updateNavigationButtons(roomName, currentIndex) {
+            const questions = document.querySelectorAll(`#${roomName}-screen .question`);
+            const totalQuestions = questions.length;
+            const prevBtn = document.getElementById(`${roomName}-prev`);
+            const nextBtn = document.getElementById(`${roomName}-next`);
+            const submitBtn = document.getElementById(`${roomName}-submit`);
+            
+            // Previous button
+            prevBtn.disabled = currentIndex === 0;
+            
+            // Next button
+            const currentAnswered = gameState.answers[roomName] && gameState.answers[roomName][currentIndex] !== undefined;
+            const isLastQuestion = currentIndex === totalQuestions - 1;
+            
+            if (isLastQuestion) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-block';
+                // Check if all questions answered for submit button
+                checkAllAnswered(roomName);
+            } else {
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+                nextBtn.disabled = !currentAnswered;
+            }
+        }
+        
+        function checkAllAnswered(roomName) {
+            const totalQuestions = document.querySelectorAll(`#${roomName}-screen .question`).length;
+            const answers = gameState.answers[roomName] || [];
+            
+            if (answers.length === totalQuestions && !answers.includes(undefined)) {
+                document.getElementById(roomName + '-submit').disabled = false;
+            }
+        }
+        
+        function updateLivesDisplay() {
+            const heartsElement = document.getElementById('lives-hearts');
+            const countElement = document.getElementById('lives-count');
+            
+            let heartsDisplay = '';
+            for (let i = 0; i < gameState.lives; i++) {
+                heartsDisplay += '❤️';
+            }
+            for (let i = gameState.lives; i < 3; i++) {
+                heartsDisplay += '💔';
+            }
+            
+            heartsElement.textContent = heartsDisplay;
+            countElement.textContent = `${gameState.lives}/3`;
+        }
+
+        function loseLife() {
+            gameState.lives--;
+            updateLivesDisplay();
+            
+            if (gameState.lives <= 0) {
+                gameOver();
+            }
+        }
+
+        function gameOver() {
+            gameState.endTime = new Date();
+            gameState.finalStatus = 'Game Over - Out of Lives';
+            
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('game-over-screen').classList.add('active');
+        }
+
+        function checkAnswers(roomName) {
+            const questions = document.querySelectorAll(`#${roomName}-screen .question`);
+            let correctCount = 0;
+            const totalQuestions = questions.length;
+            
+            // Track room attempts
+            if (!gameState.roomAttempts[roomName]) {
+                gameState.roomAttempts[roomName] = 0;
+            }
+            gameState.roomAttempts[roomName]++;
+            
+            // Update total questions count
+            gameState.totalQuestions += totalQuestions;
+            
+            questions.forEach((question, index) => {
+                const options = question.querySelectorAll('.option');
+                const selectedOption = question.querySelector('.option.selected');
+                const questionText = question.querySelector('h3').textContent;
+                
+                options.forEach(option => {
+                    if (option.classList.contains('selected')) {
+                        if (gameState.answers[roomName][index]) {
+                            option.classList.add('correct');
+                            correctCount++;
+                            gameState.correctAnswers++;
+                        } else {
+                            option.classList.add('incorrect');
+                            // Track wrong answer
+                            gameState.wrongAnswers.push({
+                                room: roomName,
+                                question: questionText,
+                                wrongAnswer: option.textContent,
+                                attempt: gameState.roomAttempts[roomName]
+                            });
+                        }
+                    }
+                });
+            });
+            
+            // Show results immediately
+            if (correctCount === totalQuestions) { // Must get ALL questions correct
+                showClueFound(roomName);
+                gameState.cluesFound++;
+                gameState.roomsCompleted.push(roomName);
+                unlockNextRooms();
+                updateProgress();
+                
+                // Hide submit button and show return button for successful completion
+                document.getElementById(roomName + '-submit').style.display = 'none';
+                document.getElementById(roomName + '-return').style.display = 'inline-block';
+            } else {
+                loseLife();
+                if (gameState.lives > 0) {
+                    // Show custom warning popup
+                    showWarningPopup(correctCount, totalQuestions);
+                    
+                    // Reset the room for retry - keep submit button available
+                    setTimeout(() => {
+                        resetRoomAnswers(roomName);
+                    }, 100);
+                } else {
+                    // Game over - hide submit button and show return button
+                    document.getElementById(roomName + '-submit').style.display = 'none';
+                    document.getElementById(roomName + '-return').style.display = 'inline-block';
+                }
+            }
+        }
+
+        function playWarningSound() {
+            // Create warning sound effect
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create an ominous warning sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Create a dramatic warning tone
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // A3
+                oscillator.frequency.setValueAtTime(196, audioContext.currentTime + 0.2); // G3
+                oscillator.frequency.setValueAtTime(174.61, audioContext.currentTime + 0.4); // F3
+                
+                gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
+                
+                oscillator.type = 'sawtooth';
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 1.2);
+                
+                // Add a second oscillator for harmony
+                const oscillator2 = audioContext.createOscillator();
+                const gainNode2 = audioContext.createGain();
+                
+                oscillator2.connect(gainNode2);
+                gainNode2.connect(audioContext.destination);
+                
+                oscillator2.frequency.setValueAtTime(110, audioContext.currentTime); // A2
+                oscillator2.frequency.setValueAtTime(98, audioContext.currentTime + 0.2); // G2
+                oscillator2.frequency.setValueAtTime(87.31, audioContext.currentTime + 0.4); // F2
+                
+                gainNode2.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
+                
+                oscillator2.type = 'sine';
+                oscillator2.start(audioContext.currentTime);
+                oscillator2.stop(audioContext.currentTime + 1.2);
+                
+            } catch (error) {
+                console.log('Audio not available for warning sound');
+            }
+        }
+
+        function showWarningPopup(correctCount, totalQuestions) {
+            // Play warning sound
+            playWarningSound();
+            
+            // Create popup overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'popup-overlay';
+            
+            // Create warning popup
+            const popup = document.createElement('div');
+            popup.className = 'warning-popup';
+            
+            let warningMessage = '';
+            let warningColor = '';
+            
+            if (gameState.lives === 2) {
+                warningMessage = 'BE CAREFUL! You\'re down to your last 2 lives!';
+                warningColor = '#ffa500';
+            } else if (gameState.lives === 1) {
+                warningMessage = 'FINAL WARNING! One more mistake and it\'s game over!';
+                warningColor = '#ff0000';
+            } else {
+                warningMessage = 'Wrong answers detected! Stay focused!';
+                warningColor = '#ff6347';
+            }
+            
+            popup.innerHTML = `
+                <div class="warning-title" style="color: ${warningColor};">⚠️ INCORRECT ANSWERS!</div>
+                <div class="warning-content">
+                    <div class="warning-stats">
+                        <p><strong>Your Score:</strong> ${correctCount}/${totalQuestions} questions correct</p>
+                        <p><strong>Required:</strong> ALL questions must be correct to find the clue</p>
+                    </div>
+                    <div class="lives-warning" style="background: rgba(255, 0, 0, 0.1); padding: 15px; border-radius: 8px; border: 2px solid ${warningColor}; margin: 15px 0;">
+                        <div style="font-size: 1.5rem; margin-bottom: 10px;">
+                            ${gameState.lives === 3 ? '❤️❤️❤️' : gameState.lives === 2 ? '❤️❤️💔' : '❤️💔💔'}
+                        </div>
+                        <p style="color: ${warningColor}; font-weight: bold; font-size: 1.1rem;">${warningMessage}</p>
+                        <p><strong>Lives Remaining:</strong> ${gameState.lives}/3</p>
+                    </div>
+                    <p style="font-style: italic; color: #d4af37;">Read carefully and think before answering. The manor's secrets depend on your attention to detail!</p>
+                </div>
+                <button class="warning-close-btn" onclick="closeWarningPopup()">Try Again</button>
+            `;
+            
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+        }
+        
+        function closeWarningPopup() {
+            const overlay = document.querySelector('.popup-overlay');
+            const popup = document.querySelector('.warning-popup');
+            
+            if (overlay) overlay.remove();
+            if (popup) popup.remove();
+        }
+        
+        function playClueFoundSound() {
+            // Create audio context for sound effect
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create a pleasant discovery sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Create a magical chime sound
+                oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+                oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+                oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                
+                oscillator.type = 'sine';
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.8);
+            } catch (error) {
+                // Fallback visual effect if audio fails
+                console.log('Audio not available, using visual feedback only');
+            }
+        }
+
+        function showClueFound(roomName) {
+            // Play sound effect
+            playClueFoundSound();
+            
+            const clues = {
+                'hallway': {
+                    name: 'A torn invitation with part of a date',
+                    emoji: '📜',
+                    image: 'https://i.ibb.co/6R7V8M3F/hallway-clue.jpg',
+                    description: 'A partially torn invitation card with elegant script. The visible date shows "October 13th" and mentions a "midnight gathering".'
+                },
+                'library': {
+                    name: 'A broken pocket watch stuck at 11:15',
+                    emoji: '⏰',
+                    image: 'https://i.ibb.co/5hz7xBhY/library-clue.jpg',
+                    description: 'An ornate gold pocket watch with a cracked face. The hands are frozen at exactly 11:15, and there are small drops of what appears to be blood on the crystal.'
+                },
+                'conservatory': {
+                    name: 'A glove stained with ink',
+                    emoji: '🧤',
+                    image: 'https://i.ibb.co/vC3Sx9tv/conservatory-clue.jpg',
+                    description: 'A fine leather glove, dark brown with intricate stitching. The fingertips are stained with black ink... or is it something else?'
+                },
+                'kitchen': {
+                    name: 'Charred note fragment',
+                    emoji: '🔥',
+                    image: 'https://i.ibb.co/mrHB4bQ1/kitchen-clue.jpg',
+                    description: 'A partially burned piece of parchment rescued from the fireplace. The visible words read "...not safe after midnight..." in urgent handwriting.'
+                },
+                'attic': {
+                    name: 'An old key engraved with "Study"',
+                    emoji: '🗝️',
+                    image: 'https://i.ibb.co/jP5878h9/attic-clue.jpg',
+                    description: 'An ornate brass key with intricate engravings. The word "Study" is clearly etched into the metal, and it feels cold to the touch.'
+                },
+                'basement': {
+                    name: 'Map of secret passage',
+                    emoji: '🗺️',
+                    image: 'https://i.ibb.co/FLjD7TNp/basement-clue.jpg',
+                    description: 'A hand-drawn map on aged paper showing a hidden passage connecting the basement to the study. Red X marks indicate "Emergency Exit".'
+                }
+            };
+            
+            // Create popup overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'popup-overlay';
+            
+            // Create popup
+            const popup = document.createElement('div');
+            popup.className = 'clue-popup';
+            popup.innerHTML = `
+                <div class="clue-title">🔍 Clue Discovered!</div>
+                <div class="clue-image">
+                    <img src="${clues[roomName].image}" 
+                         alt="${clues[roomName].name}" 
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='${clues[roomName].emoji}';">
+                </div>
+                <div class="clue-description">${clues[roomName].description}</div>
+                <button class="clue-close-btn" onclick="closeCluePopup()">Continue Investigation</button>
+            `;
+            
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+            
+            // Add to clue list
+            const clueList = document.getElementById('clue-list');
+            const clueItem = document.createElement('div');
+            clueItem.className = 'clue-item';
+            clueItem.innerHTML = `${clues[roomName].emoji} ${clues[roomName].name}`;
+            clueList.appendChild(clueItem);
+            
+            // Popup stays open until user clicks continue button
+        }
+        
+        function closeCluePopup() {
+            const overlay = document.querySelector('.popup-overlay');
+            const popup = document.querySelector('.clue-popup');
+            
+            if (overlay) overlay.remove();
+            if (popup) popup.remove();
+            
+            // Return to map screen
+            returnToMap();
+        }
+        
+        function unlockNextRooms() {
+            const roomOrder = ['hallway', 'library', 'conservatory', 'kitchen', 'attic', 'basement'];
+            const currentIndex = roomOrder.indexOf(gameState.roomsCompleted[gameState.roomsCompleted.length - 1]);
+            
+            if (currentIndex < roomOrder.length - 1) {
+                const nextRoom = roomOrder[currentIndex + 1];
+                const nextButton = document.getElementById(nextRoom + '-btn');
+                nextButton.classList.remove('locked');
+                const statusElement = nextButton.querySelector('.room-status');
+                statusElement.textContent = 'Available';
+                nextButton.onclick = () => enterRoom(nextRoom);
+            }
+            
+            // Unlock study if all rooms completed
+            if (gameState.cluesFound >= 6) {
+                const studyButton = document.getElementById('study-btn');
+                studyButton.classList.remove('locked');
+                const statusElement = studyButton.querySelector('.room-status');
+                statusElement.textContent = 'Ready!';
+                studyButton.onclick = () => enterRoom('study');
+            }
+        }
+        
+        function updateProgress() {
+            const progress = (gameState.cluesFound / 6) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('clue-count').textContent = gameState.cluesFound;
+            
+            // Mark completed rooms
+            gameState.roomsCompleted.forEach(room => {
+                const button = document.getElementById(room + '-btn') || document.querySelector(`[onclick="enterRoom('${room}')"]`);
+                if (button) {
+                    button.classList.add('completed');
+                }
+            });
+        }
+        
+        function returnToMap() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('map-screen').classList.add('active');
+        }
+        
+        // Drag and drop functionality
+        function allowDrop(ev) {
+            ev.preventDefault();
+            const dropZone = ev.target.closest('.drop-zone');
+            if (dropZone) {
+                dropZone.classList.add('drag-over');
+            }
+        }
+        
+        function dragLeave(ev) {
+            const dropZone = ev.target.closest('.drop-zone');
+            if (dropZone) {
+                dropZone.classList.remove('drag-over');
+            }
+        }
+        
+        function drop(ev) {
+            ev.preventDefault();
+            const dropZone = ev.target.closest('.drop-zone');
+            if (dropZone) {
+                dropZone.classList.remove('drag-over');
+                
+                const data = ev.dataTransfer.getData("text");
+                const draggedElement = document.getElementById(data);
+                
+                if (draggedElement && dropZone) {
+                    // Clear the instruction text if this is the first clue
+                    if (dropZone.children.length <= 2) { // 2 instruction paragraphs
+                        dropZone.innerHTML = '';
+                    }
+                    
+                    draggedElement.classList.remove('dragging');
+                    draggedElement.classList.add('in-drop-zone');
+                    dropZone.appendChild(draggedElement);
+                    
+                    // Add click to remove functionality
+                    draggedElement.onclick = function() {
+                        removeClueFromDropZone(this);
+                    };
+                    
+                    gameState.finalClueOrder.push(parseInt(draggedElement.dataset.order));
+                    checkFinalReadiness();
+                }
+            }
+        }
+        
+        function removeClueFromDropZone(clueElement) {
+            const originalContainer = document.getElementById('draggable-clues');
+            clueElement.classList.remove('in-drop-zone');
+            clueElement.onclick = null;
+            originalContainer.appendChild(clueElement);
+            
+            // Remove from order array
+            const order = parseInt(clueElement.dataset.order);
+            const index = gameState.finalClueOrder.indexOf(order);
+            if (index > -1) {
+                gameState.finalClueOrder.splice(index, 1);
+            }
+            
+            // Restore instruction text if drop zone is empty
+            const dropZone = document.querySelector('.drop-zone');
+            if (dropZone.children.length === 0) {
+                dropZone.innerHTML = `
+                    <p style="margin: 0; font-style: italic;">📋 Drag clues here to arrange them in chronological order</p>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #b8860b;">Click on clues in the drop zone to remove them</p>
+                `;
+            }
+            
+            checkFinalReadiness();
+        }
+        
+        // Add drag functionality to clues
+        document.addEventListener('DOMContentLoaded', function() {
+            const draggableClues = document.querySelectorAll('.draggable-clue');
+            draggableClues.forEach((clue, index) => {
+                clue.id = 'clue-' + index;
+                clue.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData("text", e.target.id);
+                    this.classList.add('dragging');
+                });
+                
+                clue.addEventListener('dragend', function(e) {
+                    this.classList.remove('dragging');
+                });
+            });
+        });
+        
+        // New final challenge system
+        let finalAnswers = [null, null, null, null]; // Track answers for 4 questions
+        
+        function selectFinalAnswer(element, isCorrect, questionIndex) {
+            // Find the question container
+            const questionDiv = element.closest('.question');
+            const options = questionDiv.querySelectorAll('.option');
+            
+            // Remove previous selection
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            
+            // Store answer
+            finalAnswers[questionIndex] = isCorrect;
+            
+            // Check if all questions are answered
+            checkFinalReadiness();
+        }
+        
+        function checkFinalReadiness() {
+            // Check if all 4 questions have been answered
+            const allAnswered = finalAnswers.every(answer => answer !== null);
+            
+            if (allAnswered) {
+                document.getElementById('final-submit').disabled = false;
+            }
+        }
+        
+        function checkFinalDeduction() {
+            gameState.endTime = new Date();
+            
+            // Count correct answers
+            const correctCount = finalAnswers.filter(answer => answer === true).length;
+            const totalQuestions = finalAnswers.length;
+            
+            // Show results on options
+            const questions = document.querySelectorAll('#study-screen .question');
+            questions.forEach((question, qIndex) => {
+                const options = question.querySelectorAll('.option');
+                options.forEach(option => {
+                    if (option.classList.contains('selected')) {
+                        if (finalAnswers[qIndex]) {
+                            option.classList.add('correct');
+                        } else {
+                            option.classList.add('incorrect');
+                        }
+                    }
+                });
+            });
+            
+            // Determine ending based on score
+            let ending;
+            if (correctCount === 4) {
+                ending = 'good-ending';
+                gameState.finalStatus = 'Mystery Solved - Perfect Detective';
+            } else if (correctCount >= 3) {
+                ending = 'partial-ending';
+                gameState.finalStatus = 'Partial Success - Some Mysteries Remain';
+            } else {
+                ending = 'bad-ending';
+                gameState.finalStatus = 'Failed Investigation - Trapped Forever';
+            }
+            
+            // Show ending after a brief delay to see the results
+            setTimeout(() => {
+                document.getElementById('study-screen').classList.remove('active');
+                document.getElementById(ending).classList.add('active');
+            }, 2000);
+        }
+
+        function downloadResults() {
+            // Calculate time taken
+            let timeTaken = 'Unknown';
+            if (gameState.startTime && gameState.endTime) {
+                const timeDiff = gameState.endTime - gameState.startTime;
+                const minutes = Math.floor(timeDiff / 60000);
+                const seconds = Math.floor((timeDiff % 60000) / 1000);
+                timeTaken = `${minutes}m ${seconds}s`;
+            }
+            
+            // Calculate score and grade
+            const clueScore = (gameState.cluesFound / 6) * 40;
+            const livesScore = (gameState.lives / 3) * 30;
+            const roomsScore = (gameState.roomsCompleted.length / 6) * 20;
+            const completionScore = gameState.finalStatus.includes('Perfect') ? 10 : 
+                                  gameState.finalStatus.includes('Partial') ? 5 : 0;
+            const totalScore = Math.round(clueScore + livesScore + roomsScore + completionScore);
+            
+            // Determine grade
+            let grade;
+            if (totalScore >= 90) grade = 'A+';
+            else if (totalScore >= 80) grade = 'A';
+            else if (totalScore >= 70) grade = 'B';
+            else if (totalScore >= 60) grade = 'C';
+            else if (totalScore >= 50) grade = 'D';
+            else grade = 'F';
+            
+            const accuracy = gameState.totalQuestions > 0 ? Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100) : 0;
+            
+            // Create comprehensive results text
+            let resultsText = `
+═══════════════════════════════════════════════════════════════
+🏰 MYSTERY AT RAVENWOOD MANOR - INVESTIGATION REPORT 🏰
+═══════════════════════════════════════════════════════════════
+
+📋 DETECTIVE INFORMATION:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name: ${gameState.playerName}
+Class/Grade: ${gameState.playerClass}
+Investigation Date: ${new Date().toLocaleDateString()}
+Investigation Time: ${new Date().toLocaleTimeString()}
+
+🎯 FINAL RESULTS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Final Status: ${gameState.finalStatus}
+Overall Grade: ${grade}
+Total Score: ${totalScore}/100 points
+Time Taken: ${timeTaken}
+
+📊 PERFORMANCE BREAKDOWN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Clues Collected: ${gameState.cluesFound}/6 (${Math.round((gameState.cluesFound/6)*100)}%)
+Lives Remaining: ${gameState.lives}/3
+Rooms Explored: ${gameState.roomsCompleted.length}/6
+Overall Accuracy: ${accuracy}% (${gameState.correctAnswers}/${gameState.totalQuestions} questions)
+
+🏠 ROOM COMPLETION STATUS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+            const roomNames = {
+                'hallway': '🕯️ Hallway (Prologue)',
+                'library': '📚 Library', 
+                'conservatory': '🌿 Conservatory',
+                'kitchen': '🔥 Kitchen',
+                'attic': '📦 Attic',
+                'basement': '🔒 Basement'
+            };
+            
+            Object.keys(roomNames).forEach(room => {
+                const attempts = gameState.roomAttempts[room] || 0;
+                const completed = gameState.roomsCompleted.includes(room);
+                let status;
+                
+                if (completed) {
+                    status = `✅ COMPLETED in ${attempts} attempt${attempts !== 1 ? 's' : ''}`;
+                } else if (attempts > 0) {
+                    status = `❌ FAILED after ${attempts} attempt${attempts !== 1 ? 's' : ''}`;
+                } else {
+                    status = `🚫 NOT ATTEMPTED`;
+                }
+                
+                resultsText += `\n${roomNames[room]}: ${status}`;
+            });
+
+            if (gameState.wrongAnswers.length > 0) {
+                resultsText += `\n\n❌ INCORRECT ANSWERS MADE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+                
+                gameState.wrongAnswers.forEach((mistake, index) => {
+                    const roomName = mistake.room.charAt(0).toUpperCase() + mistake.room.slice(1);
+                    resultsText += `\n\n${index + 1}. ${roomName} - Attempt ${mistake.attempt}
+   Question: ${mistake.question}
+   Your Answer: "${mistake.wrongAnswer}"`;
+                });
+            } else {
+                resultsText += `\n\n🎉 PERFECT PERFORMANCE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+No incorrect answers! Outstanding detective work!`;
+            }
+
+            resultsText += `\n\n🏆 GRADE BREAKDOWN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Clue Collection: ${Math.round(clueScore)}/40 points
+Lives Preserved: ${Math.round(livesScore)}/30 points
+Room Exploration: ${Math.round(roomsScore)}/20 points
+Mystery Solution: ${completionScore}/10 points
+TOTAL SCORE: ${totalScore}/100 points
+
+📝 GRADE SCALE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+A+ (90-100): Outstanding Detective - Master of Mysteries
+A  (80-89):  Excellent Detective - Great Potential
+B  (70-79):  Good Detective - Solid Investigation Skills
+C  (60-69):  Fair Detective - Keep Practicing
+D  (50-59):  Novice Detective - Needs Improvement
+F  (0-49):   Failed Investigation - Try Again
+
+═══════════════════════════════════════════════════════════════
+Thank you for playing Mystery at Ravenwood Manor!
+Visit again to test your detective skills further.
+═══════════════════════════════════════════════════════════════`;
+
+            // Create and download the file
+            const blob = new Blob([resultsText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Ravenwood_Manor_Results_${gameState.playerName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function showResults() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('results-screen').classList.add('active');
+            
+            // Calculate time taken
+            let timeTaken = 'Unknown';
+            if (gameState.startTime && gameState.endTime) {
+                const timeDiff = gameState.endTime - gameState.startTime;
+                const minutes = Math.floor(timeDiff / 60000);
+                const seconds = Math.floor((timeDiff % 60000) / 1000);
+                timeTaken = `${minutes}m ${seconds}s`;
+            }
+            
+            // Calculate score and grade
+            const clueScore = (gameState.cluesFound / 6) * 40; // 40 points for clues
+            const livesScore = (gameState.lives / 3) * 30; // 30 points for lives
+            const roomsScore = (gameState.roomsCompleted.length / 6) * 20; // 20 points for rooms
+            const completionScore = gameState.finalStatus.includes('Perfect') ? 10 : 
+                                  gameState.finalStatus.includes('Partial') ? 5 : 0; // 10 points for completion
+            
+            const totalScore = Math.round(clueScore + livesScore + roomsScore + completionScore);
+            
+            // Determine grade
+            let grade, gradeComment, gradeColor;
+            if (totalScore >= 90) {
+                grade = 'A+';
+                gradeComment = 'Outstanding detective work! You\'ve mastered the mysteries of Ravenwood Manor.';
+                gradeColor = '#00ff00';
+            } else if (totalScore >= 80) {
+                grade = 'A';
+                gradeComment = 'Excellent investigation! You have great potential as a detective.';
+                gradeColor = '#32cd32';
+            } else if (totalScore >= 70) {
+                grade = 'B';
+                gradeComment = 'Good detective work! With more practice, you\'ll solve any mystery.';
+                gradeColor = '#ffd700';
+            } else if (totalScore >= 60) {
+                grade = 'C';
+                gradeComment = 'Fair investigation. Keep practicing your reading comprehension skills.';
+                gradeColor = '#ffa500';
+            } else if (totalScore >= 50) {
+                grade = 'D';
+                gradeComment = 'You tried, but the manor\'s mysteries proved challenging. Try again!';
+                gradeColor = '#ff6347';
+            } else {
+                grade = 'F';
+                gradeComment = 'The mysteries of Ravenwood Manor remain unsolved. Don\'t give up!';
+                gradeColor = '#ff0000';
+            }
+            
+            // Update results display
+            document.getElementById('result-name').textContent = gameState.playerName;
+            document.getElementById('result-class').textContent = gameState.playerClass;
+            document.getElementById('result-status').textContent = gameState.finalStatus;
+            document.getElementById('result-clues').textContent = gameState.cluesFound;
+            document.getElementById('result-lives').textContent = gameState.lives;
+            document.getElementById('result-rooms').textContent = gameState.roomsCompleted.length;
+            document.getElementById('result-score').textContent = totalScore;
+            
+            const gradeBadge = document.getElementById('grade-badge');
+            gradeBadge.textContent = grade;
+            gradeBadge.style.color = gradeColor;
+            document.getElementById('grade-comment').textContent = gradeComment;
+            
+            // Add time taken to performance stats
+            const performanceStats = document.querySelector('.performance-stats');
+            const timeElement = document.createElement('p');
+            timeElement.innerHTML = `<strong>Time Taken:</strong> ${timeTaken}`;
+            performanceStats.appendChild(timeElement);
+            
+            const accuracyElement = document.createElement('p');
+            const accuracy = gameState.totalQuestions > 0 ? Math.round((gameState.correctAnswers / gameState.totalQuestions) * 100) : 0;
+            accuracyElement.innerHTML = `<strong>Overall Accuracy:</strong> ${accuracy}% (${gameState.correctAnswers}/${gameState.totalQuestions})`;
+            performanceStats.appendChild(accuracyElement);
+            
+            // Populate wrong answers section
+            const wrongAnswersList = document.getElementById('wrong-answers-list');
+            if (gameState.wrongAnswers.length > 0) {
+                wrongAnswersList.innerHTML = '';
+                gameState.wrongAnswers.forEach((mistake, index) => {
+                    const mistakeDiv = document.createElement('div');
+                    mistakeDiv.style.marginBottom = '10px';
+                    mistakeDiv.style.padding = '8px';
+                    mistakeDiv.style.background = 'rgba(255, 0, 0, 0.1)';
+                    mistakeDiv.style.borderRadius = '5px';
+                    mistakeDiv.style.borderLeft = '3px solid #ff6347';
+                    
+                    const roomName = mistake.room.charAt(0).toUpperCase() + mistake.room.slice(1);
+                    mistakeDiv.innerHTML = `
+                        <strong>❌ ${roomName} - Attempt ${mistake.attempt}</strong><br>
+                        <em>Question:</em> ${mistake.question}<br>
+                        <em>Your Answer:</em> "${mistake.wrongAnswer}"
+                    `;
+                    wrongAnswersList.appendChild(mistakeDiv);
+                });
+            } else {
+                wrongAnswersList.innerHTML = '<p style="color: #00ff00; text-align: center;">🎉 Perfect! No wrong answers!</p>';
+            }
+            
+            // Populate room attempts section
+            const roomAttemptsList = document.getElementById('room-attempts-list');
+            roomAttemptsList.innerHTML = '';
+            
+            const roomNames = {
+                'hallway': '🕯️ Hallway',
+                'library': '📚 Library', 
+                'conservatory': '🌿 Conservatory',
+                'kitchen': '🔥 Kitchen',
+                'attic': '📦 Attic',
+                'basement': '🔒 Basement'
+            };
+            
+            Object.keys(roomNames).forEach(room => {
+                const attemptDiv = document.createElement('div');
+                attemptDiv.style.marginBottom = '8px';
+                attemptDiv.style.padding = '8px';
+                attemptDiv.style.borderRadius = '5px';
+                
+                const attempts = gameState.roomAttempts[room] || 0;
+                const completed = gameState.roomsCompleted.includes(room);
+                
+                if (completed) {
+                    attemptDiv.style.background = 'rgba(0, 128, 0, 0.1)';
+                    attemptDiv.style.borderLeft = '3px solid #00ff00';
+                    attemptDiv.innerHTML = `<strong>${roomNames[room]}</strong> - ✅ Completed in ${attempts} attempt${attempts !== 1 ? 's' : ''}`;
+                } else if (attempts > 0) {
+                    attemptDiv.style.background = 'rgba(255, 165, 0, 0.1)';
+                    attemptDiv.style.borderLeft = '3px solid #ffa500';
+                    attemptDiv.innerHTML = `<strong>${roomNames[room]}</strong> - ❌ Failed after ${attempts} attempt${attempts !== 1 ? 's' : ''}`;
+                } else {
+                    attemptDiv.style.background = 'rgba(128, 128, 128, 0.1)';
+                    attemptDiv.style.borderLeft = '3px solid #888';
+                    attemptDiv.innerHTML = `<strong>${roomNames[room]}</strong> - 🚫 Not attempted`;
+                }
+                
+                roomAttemptsList.appendChild(attemptDiv);
+            });
+            
+            // Set results container color based on grade
+            const resultsContainer = document.getElementById('results-container');
+            if (totalScore >= 80) {
+                resultsContainer.className = 'ending good';
+            } else if (totalScore >= 60) {
+                resultsContainer.className = 'ending partial';
+            } else {
+                resultsContainer.className = 'ending bad';
+            }
+        }
+
+        function goToHomepage() {
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('homepage').classList.add('active');
+        }
+        
+        function restartGame() {
+            gameState = {
+                currentRoom: null,
+                cluesFound: 0,
+                roomsCompleted: [],
+                answers: {},
+                finalClueOrder: [],
+                selectedSuspect: null,
+                playerName: '',
+                playerClass: '',
+                lives: 3,
+                startTime: null,
+                endTime: null,
+                finalStatus: 'Unknown',
+                wrongAnswers: [],
+                roomAttempts: {},
+                totalQuestions: 0,
+                correctAnswers: 0
+            };
+            
+            // Reset final answers
+            finalAnswers = [null, null, null, null];
+            
+            // Reset UI
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            document.getElementById('homepage').classList.add('active');
+            
+            // Reset form
+            document.getElementById('player-name').value = '';
+            document.getElementById('player-class').value = '';
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('start-btn').nextElementSibling.style.display = 'block';
+            
+            // Reset room buttons
+            document.querySelectorAll('.room-button').forEach(button => {
+                button.classList.remove('completed');
+                if (button.id && button.id !== 'hallway-btn') {
+                    button.classList.add('locked');
+                    const statusElement = button.querySelector('.room-status');
+                    if (statusElement) {
+                        if (button.id === 'study-btn') {
+                            statusElement.textContent = 'Final Room';
+                        } else {
+                            statusElement.textContent = 'Locked';
+                        }
+                    }
+                    button.onclick = null;
+                }
+            });
+            
+            // Clear clue list
+            document.getElementById('clue-list').innerHTML = '';
+            
+
+            
+            // Reset progress
+            updateProgress();
+        }
+
+        // Add event listeners for form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('player-name').addEventListener('input', validatePlayerInfo);
+            document.getElementById('player-class').addEventListener('input', validatePlayerInfo);
+        });
+        
+        // Optimized ambient effects
+        let ambientSounds = {
+            thunder: false,
+            creaking: false,
+            whispers: false
+        };
+        
+        // Lightning effect every 15-30 seconds
+        function triggerLightning() {
+            if (!ambientSounds.thunder) {
+                ambientSounds.thunder = true;
+                const lightning = document.querySelector('.lightning');
+                
+                // Double flash effect
+                lightning.style.opacity = '0.4';
+                setTimeout(() => {
+                    lightning.style.opacity = '0';
+                    setTimeout(() => {
+                        lightning.style.opacity = '0.6';
+                        setTimeout(() => {
+                            lightning.style.opacity = '0';
+                            ambientSounds.thunder = false;
+                        }, 100);
+                    }, 150);
+                }, 200);
+            }
+            
+            // Schedule next lightning between 15-30 seconds
+            const nextLightning = Math.random() * 15000 + 15000; // 15-30 seconds
+            setTimeout(triggerLightning, nextLightning);
+        }
+        
+        // Start lightning system
+        setTimeout(triggerLightning, Math.random() * 10000 + 5000); // First lightning in 5-15 seconds
+        
+        // Creaking floor effect (optimized)
+        setInterval(() => {
+            if (Math.random() < 0.15 && !ambientSounds.creaking) { // 15% chance for creaking
+                ambientSounds.creaking = true;
+                const soundWave = document.querySelector('.sound-wave');
+                if (soundWave) {
+                    soundWave.style.opacity = '1';
+                    setTimeout(() => {
+                        soundWave.style.opacity = '0.6';
+                        ambientSounds.creaking = false;
+                    }, 600);
+                }
+            }
+        }, 8000);
+        
+        // Optimized parallax movement (throttled)
+        let parallaxTimeout;
+        document.addEventListener('mousemove', (e) => {
+            if (parallaxTimeout) return;
+            parallaxTimeout = setTimeout(() => {
+                const parallaxBg = document.querySelector('.parallax-bg');
+                if (parallaxBg) {
+                    const x = (e.clientX / window.innerWidth) * 10 - 5;
+                    const y = (e.clientY / window.innerHeight) * 10 - 5;
+                    parallaxBg.style.transform = `translate(${x}px, ${y}px) scale(1.01)`;
+                }
+                parallaxTimeout = null;
+            }, 50);
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96de493c865835aa',t:'MTc1NDk4NDAyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

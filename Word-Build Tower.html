@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word-Build Tower Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #FFE4B5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            color: white;
+            text-align: center;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '🏗️';
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        .header::after {
+            content: '🎯';
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2rem;
+            animation: bounce 2s infinite 1s;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .game-info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .affix-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            border: 3px solid #e9ecef;
+        }
+
+        .affix-section h3 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+
+        .affix-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .affix-btn {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            min-height: 44px;
+            min-width: 44px;
+            touch-action: manipulation;
+        }
+
+        .affix-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .affix-btn.selected {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .affix-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        .word-input-area {
+            text-align: center;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .word-input {
+            flex: 1;
+            padding: 15px;
+            border: 3px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-family: inherit;
+        }
+
+        .word-input:focus {
+            outline: none;
+            border-color: #4ECDC4;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+        }
+
+        .word-input:disabled {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+            border-color: #dee2e6;
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .feedback.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .score-display {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .score-display h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .tower-area {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            border: 3px solid #e9ecef;
+        }
+
+        .tower-area h3 {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .tower-container {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 2px;
+            min-height: 400px;
+            justify-content: flex-start;
+            position: relative;
+            width: 100%;
+        }
+
+        .tower-base {
+            width: 200px;
+            height: 20px;
+            background: linear-gradient(45deg, #8B4513, #A0522D);
+            border-radius: 10px;
+            margin-top: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .tower-base::before {
+            content: '🏗️ FOUNDATION 🏗️';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .tower-block {
+            width: 160px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            animation: blockDrop 0.6s ease-out;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .tower-block::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            box-shadow: 
+                15px 0 rgba(255, 255, 255, 0.4),
+                30px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .tower-block:nth-child(1) { background: linear-gradient(45deg, #FF6B6B, #FF8E53); }
+        .tower-block:nth-child(2) { background: linear-gradient(45deg, #4ECDC4, #44A08D); }
+        .tower-block:nth-child(3) { background: linear-gradient(45deg, #45B7D1, #96CEB4); }
+        .tower-block:nth-child(4) { background: linear-gradient(45deg, #F7DC6F, #F4D03F); }
+        .tower-block:nth-child(5) { background: linear-gradient(45deg, #BB8FCE, #A569BD); }
+        .tower-block:nth-child(6) { background: linear-gradient(45deg, #F1948A, #EC7063); }
+        .tower-block:nth-child(7) { background: linear-gradient(45deg, #82E0AA, #58D68D); }
+        .tower-block:nth-child(8) { background: linear-gradient(45deg, #85C1E9, #5DADE2); }
+        .tower-block:nth-child(9) { background: linear-gradient(45deg, #F8C471, #F5B041); }
+        .tower-block:nth-child(10) { background: linear-gradient(45deg, #D7BDE2, #C39BD3); }
+
+        .tower-block:nth-child(n+11) { 
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            animation: goldGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes goldGlow {
+            from { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 215, 0, 0.5); }
+            to { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 30px rgba(255, 215, 0, 0.8); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3); }
+        }
+
+        @keyframes blockDrop {
+            from {
+                transform: translateY(-100px) rotate(10deg);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(10px) rotate(-5deg);
+                opacity: 0.8;
+            }
+            to {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .certificate-btn {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .certificate-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .certificate-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .word-list {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .word-list h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .word-item {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .student-info {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .info-form {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .info-form h2 {
+            color: #495057;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            color: #495057;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4ECDC4;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+
+        .start-btn {
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-main {
+            display: none;
+        }
+
+        .hint-section {
+            background: #fff3cd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .hint-section h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .hint-text {
+            color: #856404;
+            font-style: italic;
+        }
+
+        .popup-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #4ECDC4, #44A08D);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            max-width: 500px;
+            animation: popupSlide 0.5s ease-out;
+        }
+
+        @keyframes popupSlide {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .game-area {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .header::before,
+            .header::after {
+                font-size: 1.5rem;
+                top: 15px;
+            }
+            
+            .header::before {
+                left: 15px;
+            }
+            
+            .header::after {
+                right: 15px;
+            }
+            
+            .affix-section {
+                padding: 20px 15px;
+            }
+            
+            .affix-buttons {
+                justify-content: center;
+                gap: 8px;
+            }
+            
+            .affix-btn {
+                padding: 12px 18px;
+                font-size: 1rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .word-input {
+                padding: 12px;
+                font-size: 1.1rem;
+            }
+            
+            .submit-btn {
+                padding: 12px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .tower-area {
+                padding: 15px;
+                min-height: 400px;
+            }
+            
+            .tower-block {
+                width: 140px;
+                font-size: 0.9rem;
+                height: 35px;
+            }
+            
+            .tower-base {
+                width: 160px;
+            }
+            
+            .score-display {
+                padding: 15px;
+            }
+            
+            .score {
+                font-size: 2rem;
+            }
+            
+            .info-form {
+                padding: 25px 20px;
+                margin: 10px;
+            }
+            
+            .info-form h2 {
+                font-size: 1.6rem;
+            }
+            
+            .form-group input {
+                padding: 12px;
+                font-size: 1rem;
+            }
+            
+            .word-list {
+                max-height: 120px;
+            }
+            
+            .feedback {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .affix-btn {
+                padding: 10px 15px;
+                font-size: 0.95rem;
+            }
+            
+            .tower-block {
+                width: 120px;
+                font-size: 0.85rem;
+                height: 32px;
+            }
+            
+            .tower-base {
+                width: 140px;
+            }
+            
+            .info-form {
+                padding: 20px 15px;
+            }
+            
+            .score {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="studentInfo" class="student-info">
+            <div class="info-form" style="max-width: 700px;">
+                <h2>🎮 Welcome to Word-Build Tower!</h2>
+                
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 15px; margin-bottom: 25px; border-left: 6px solid #28a745;">
+                    <h3 style="color: #155724; margin-bottom: 15px; font-size: 1.3rem;">📚 What is a Root Word?</h3>
+                    <p style="color: #155724; margin: 10px 0; font-size: 1.1rem;">
+                        A <strong>root word</strong> is like the foundation of a house! It's the main part of a word that carries the basic meaning.
+                    </p>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #155724; margin-bottom: 10px;">🔧 What is a Prefix?</h4>
+                        <p style="color: #155724; margin: 5px 0; font-size: 1rem;">
+                            A <strong>prefix</strong> goes at the <strong>beginning</strong> of a root word to change its meaning:
+                        </p>
+                        <p style="color: #155724; margin: 5px 0; font-size: 1rem;">
+                            <span style="background: #ff6b6b; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">re-</span> + 
+                            <span style="background: #4ecdc4; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">read</span> = 
+                            <span style="background: #ffd700; color: black; padding: 3px 8px; border-radius: 5px; font-weight: bold;">reread</span> (read again)
+                        </p>
+                        <p style="color: #155724; margin: 5px 0; font-size: 1rem;">
+                            <span style="background: #ff6b6b; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">un-</span> + 
+                            <span style="background: #4ecdc4; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">happy</span> = 
+                            <span style="background: #ffd700; color: black; padding: 3px 8px; border-radius: 5px; font-weight: bold;">unhappy</span> (not happy)
+                        </p>
+                    </div>
+                    
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #155724; margin-bottom: 10px;">🔧 What is a Suffix?</h4>
+                        <p style="color: #155724; margin: 5px 0; font-size: 1rem;">
+                            A <strong>suffix</strong> goes at the <strong>end</strong> of a root word to change its meaning:
+                        </p>
+                        <p style="color: #155724; margin: 5px 0; font-size: 1rem;">
+                            <span style="background: #4ecdc4; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">jump</span> + 
+                            <span style="background: #ff6b6b; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">-ing</span> = 
+                            <span style="background: #ffd700; color: black; padding: 3px 8px; border-radius: 5px; font-weight: bold;">jumping</span> (doing it now)
+                        </p>
+                        <p style="color: #155724; margin: 5px 0; font-size: 1rem;">
+                            <span style="background: #4ecdc4; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">quick</span> + 
+                            <span style="background: #ff6b6b; color: white; padding: 3px 8px; border-radius: 5px; font-weight: bold;">-ly</span> = 
+                            <span style="background: #ffd700; color: black; padding: 3px 8px; border-radius: 5px; font-weight: bold;">quickly</span> (in a quick way)
+                        </p>
+                    </div>
+                </div>
+
+                <div style="background: #fff3cd; padding: 20px; border-radius: 15px; margin-bottom: 25px; border-left: 6px solid #ffc107;">
+                    <h3 style="color: #856404; margin-bottom: 15px; font-size: 1.3rem;">🎯 How to Play:</h3>
+                    <div style="text-align: left;">
+                        <p style="color: #856404; margin: 8px 0; font-size: 1rem;"><strong>1.</strong> You have <strong>3 minutes</strong> to build your tower!</p>
+                        <p style="color: #856404; margin: 8px 0; font-size: 1rem;"><strong>2.</strong> Click a prefix (like re-) or suffix (like -ing)</p>
+                        <p style="color: #856404; margin: 8px 0; font-size: 1rem;"><strong>3.</strong> Type a root word that works with it</p>
+                        <p style="color: #856404; margin: 8px 0; font-size: 1rem;"><strong>4.</strong> Click "Add Block!" to build your tower</p>
+                        <p style="color: #856404; margin: 8px 0; font-size: 1rem;"><strong>5.</strong> Build 5+ blocks to earn a certificate!</p>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="studentName">Your Name:</label>
+                    <input type="text" id="studentName" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="studentClass">Your Class:</label>
+                    <input type="text" id="studentClass" placeholder="Enter your class (e.g., 9SC1, 9GP2)">
+                </div>
+                <div id="startFeedback" class="feedback" style="display: none;"></div>
+                <button class="start-btn" onclick="startGame()">🚀 Start Building!</button>
+            </div>
+        </div>
+
+        <div id="gameMain" class="game-main">
+            <div class="header">
+                <h1>🏗️ Word-Build Tower</h1>
+                <p>Build your tower by creating words with prefixes and suffixes!</p>
+            </div>
+
+            <div class="game-area">
+                <div class="left-panel">
+                    <div class="game-info">
+                        <h3>⏰ Time Remaining</h3>
+                        <div class="timer" id="timer">3:00</div>
+                        <p>Build as many words as you can!</p>
+                    </div>
+
+                    <div class="affix-section">
+                        <h3 id="affixTitle">📝 Choose a Prefix or Suffix:</h3>
+                        <div class="affix-buttons" id="affixButtons">
+                            <button class="affix-btn" data-affix="re-" data-type="prefix">re-</button>
+                            <button class="affix-btn" data-affix="un-" data-type="prefix">un-</button>
+                            <button class="affix-btn" data-affix="pre-" data-type="prefix">pre-</button>
+                            <button class="affix-btn" data-affix="-ing" data-type="suffix">-ing</button>
+                            <button class="affix-btn" data-affix="-ed" data-type="suffix">-ed</button>
+                            <button class="affix-btn" data-affix="-ly" data-type="suffix">-ly</button>
+                        </div>
+
+                        <div class="word-input-area">
+                            <div class="input-group">
+                                <input type="text" class="word-input" id="wordInput" placeholder="Select a prefix/suffix first...">
+                                <button class="submit-btn" onclick="submitWord()">Add Block!</button>
+                            </div>
+                            <div id="feedback" class="feedback" style="display: none;"></div>
+                        </div>
+
+                        <div class="hint-section">
+                            <h4>💡 Hint:</h4>
+                            <div class="hint-text" id="hintText">Select a prefix or suffix to get a hint!</div>
+                        </div>
+
+                        <div class="word-list">
+                            <h4>🎯 Your Words:</h4>
+                            <div id="wordsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-panel">
+                    <div class="score-display">
+                        <h3>🏆 Tower Height</h3>
+                        <div class="score" id="score">0</div>
+                        <p>blocks tall</p>
+                    </div>
+
+                    <div class="tower-area">
+                        <h3>🏗️ Your Tower</h3>
+                        <div class="tower-container" id="tower">
+                            <div class="tower-base"></div>
+                        </div>
+                        <button class="certificate-btn" id="certificateBtn" onclick="generateCertificate()" disabled>
+                            🏆 Get Certificate (Need 5+ blocks)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedAffix = '';
+        let selectedType = '';
+        let score = 0;
+        let builtWords = [];
+        let timeRemaining = 180; // 3 minutes
+        let timerInterval;
+        let studentName = '';
+        let studentClass = '';
+
+        // Valid word combinations - expanded with many more options
+        const validWords = {
+            're-': ['read', 'write', 'do', 'make', 'build', 'play', 'start', 'turn', 'view', 'new', 'use', 'fill', 'heat', 'open', 'tell', 'think', 'work', 'call', 'move', 'place', 'visit', 'check', 'count', 'paint', 'print', 'wind', 'wrap', 'load', 'fresh', 'cycle', 'act', 'add', 'adjust', 'appear', 'apply', 'arrange', 'attach', 'born', 'bound', 'break', 'breathe', 'buy', 'calculate', 'capture', 'charge', 'choose', 'claim', 'clean', 'climb', 'close', 'collect', 'combine', 'come', 'connect', 'consider', 'construct', 'create', 'cut', 'design', 'develop', 'direct', 'discover', 'draw', 'dress', 'enter', 'establish', 'examine', 'explain', 'explore', 'face', 'fall', 'feel', 'fight', 'find', 'finish', 'fit', 'fix', 'focus', 'follow', 'form', 'freeze', 'gain', 'gather', 'get', 'give', 'go', 'grow', 'handle', 'hang', 'happen', 'hold', 'imagine', 'install', 'introduce', 'join', 'jump', 'keep', 'know', 'land', 'launch', 'lay', 'learn', 'leave', 'light', 'listen', 'live', 'locate', 'look', 'lose', 'mark', 'match', 'meet', 'member', 'mind', 'mix', 'model', 'name', 'order', 'organize', 'pack', 'pair', 'park', 'pass', 'pay', 'pick', 'plan', 'plant', 'position', 'prepare', 'present', 'press', 'produce', 'program', 'protect', 'pull', 'push', 'put', 'quest', 'reach', 'record', 'run', 'save', 'search', 'see', 'sell', 'send', 'serve', 'set', 'settle', 'shape', 'share', 'show', 'shut', 'sign', 'sit', 'solve', 'sort', 'sound', 'speak', 'spend', 'stand', 'stay', 'step', 'stick', 'stop', 'store', 'study', 'supply', 'support', 'take', 'teach', 'test', 'tie', 'touch', 'track', 'train', 'try', 'unite', 'update', 'walk', 'want', 'wash', 'watch', 'wear', 'win', 'wish', 'word', 'write'],
+            'un-': ['happy', 'lock', 'tie', 'wrap', 'fair', 'kind', 'safe', 'sure', 'able', 'done', 'do', 'pack', 'fold', 'cover', 'load', 'zip', 'button', 'plug', 'roll', 'wind', 'lucky', 'healthy', 'clean', 'clear', 'comfortable', 'equal', 'finished', 'friendly', 'helpful', 'known', 'acceptable', 'afraid', 'alive', 'alone', 'angry', 'armed', 'available', 'aware', 'balanced', 'beaten', 'believable', 'bent', 'born', 'bound', 'broken', 'built', 'burned', 'busy', 'calm', 'careful', 'certain', 'changed', 'charged', 'checked', 'chosen', 'closed', 'cooked', 'cool', 'correct', 'counted', 'cut', 'damaged', 'decided', 'defeated', 'developed', 'different', 'direct', 'dressed', 'easy', 'educated', 'employed', 'ended', 'even', 'expected', 'explained', 'fair', 'familiar', 'fast', 'fed', 'filled', 'finished', 'fit', 'fixed', 'folded', 'forgotten', 'formed', 'found', 'free', 'frozen', 'full', 'funny', 'given', 'glad', 'good', 'grown', 'guarded', 'happy', 'hard', 'heard', 'heated', 'heavy', 'hidden', 'high', 'honest', 'hurt', 'important', 'interested', 'invited', 'joined', 'kept', 'kind', 'known', 'large', 'late', 'learned', 'left', 'legal', 'light', 'limited', 'lined', 'listed', 'lived', 'loaded', 'locked', 'long', 'lost', 'loud', 'loved', 'low', 'lucky', 'made', 'marked', 'married', 'matched', 'moved', 'named', 'natural', 'needed', 'new', 'nice', 'normal', 'noticed', 'old', 'open', 'ordered', 'organized', 'owned', 'packed', 'paid', 'painted', 'paired', 'planned', 'played', 'pleased', 'popular', 'possible', 'prepared', 'pressed', 'printed', 'protected', 'proud', 'pure', 'quiet', 'real', 'reasonable', 'related', 'removed', 'repeated', 'replaced', 'reported', 'required', 'rested', 'right', 'safe', 'saved', 'sealed', 'seen', 'selected', 'sent', 'serious', 'served', 'settled', 'shared', 'short', 'shown', 'shut', 'signed', 'simple', 'skilled', 'small', 'smooth', 'soft', 'solved', 'sorted', 'special', 'spoken', 'stable', 'started', 'steady', 'stopped', 'straight', 'strong', 'stuck', 'studied', 'successful', 'supported', 'sure', 'surprised', 'sweet', 'taken', 'tall', 'taught', 'tested', 'thick', 'thin', 'tied', 'tight', 'tired', 'told', 'touched', 'trained', 'true', 'turned', 'used', 'usual', 'wanted', 'warm', 'washed', 'watched', 'weak', 'welcome', 'well', 'wet', 'wide', 'wild', 'willing', 'wise', 'worked', 'worried', 'written', 'wrong', 'young'],
+            'pre-': ['view', 'heat', 'cook', 'pay', 'order', 'school', 'test', 'plan', 'made', 'fix', 'wash', 'cut', 'mix', 'set', 'game', 'teen', 'judge', 'select', 'arrange', 'historic', 'mature', 'caution', 'condition', 'determine', 'exist', 'face', 'flight', 'form', 'position', 'record', 'approve', 'build', 'calculate', 'cancel', 'cast', 'check', 'choose', 'clean', 'code', 'cool', 'date', 'dawn', 'design', 'dict', 'direct', 'dispose', 'dress', 'drill', 'dry', 'establish', 'examine', 'fabricate', 'filter', 'finish', 'freeze', 'historic', 'install', 'launch', 'load', 'locate', 'mark', 'measure', 'natal', 'occupy', 'pack', 'pare', 'process', 'program', 'qualify', 'register', 'requisite', 'schedule', 'screen', 'season', 'sell', 'shrunk', 'sort', 'suppose', 'tend', 'treat', 'war', 'warn', 'work', 'written'],
+            '-ing': ['run', 'jump', 'play', 'sing', 'dance', 'read', 'write', 'swim', 'walk', 'talk', 'cook', 'look', 'work', 'help', 'clean', 'paint', 'build', 'think', 'learn', 'teach', 'act', 'add', 'ask', 'bring', 'buy', 'call', 'carry', 'catch', 'change', 'choose', 'climb', 'close', 'come', 'cry', 'cut', 'dig', 'draw', 'dream', 'drink', 'drive', 'eat', 'fall', 'feel', 'fight', 'find', 'fly', 'follow', 'get', 'give', 'go', 'grow', 'hang', 'hear', 'hide', 'hit', 'hold', 'hope', 'hunt', 'keep', 'know', 'laugh', 'leave', 'lift', 'listen', 'live', 'love', 'make', 'meet', 'move', 'open', 'pick', 'plan', 'pull', 'push', 'put', 'reach', 'rest', 'ride', 'ring', 'rise', 'save', 'say', 'see', 'sell', 'send', 'show', 'shut', 'sit', 'sleep', 'speak', 'stand', 'start', 'stay', 'stop', 'take', 'tell', 'throw', 'touch', 'try', 'turn', 'use', 'visit', 'wait', 'wake', 'want', 'wash', 'watch', 'wear', 'win', 'wish'],
+            '-ed': ['walk', 'talk', 'play', 'jump', 'cook', 'look', 'work', 'help', 'clean', 'paint', 'wash', 'brush', 'push', 'pull', 'kick', 'pick', 'pack', 'rock', 'lock', 'act', 'add', 'ask', 'bake', 'bark', 'boil', 'book', 'call', 'camp', 'care', 'carry', 'catch', 'change', 'check', 'chop', 'clap', 'climb', 'close', 'count', 'cover', 'crash', 'cry', 'dance', 'dig', 'drop', 'dry', 'dust', 'end', 'enjoy', 'explain', 'face', 'fail', 'fill', 'finish', 'fix', 'fold', 'follow', 'form', 'fry', 'grab', 'guess', 'hammer', 'hand', 'hang', 'heal', 'heat', 'hug', 'hunt', 'hurry', 'join', 'joke', 'kiss', 'knock', 'land', 'last', 'laugh', 'learn', 'lift', 'like', 'listen', 'live', 'load', 'love', 'mail', 'march', 'mark', 'match', 'melt', 'miss', 'mix', 'move', 'nail', 'name', 'need', 'open', 'order', 'park', 'pass', 'pat', 'peel', 'phone', 'plan', 'plant', 'point', 'pour', 'print', 'pump', 'race', 'rain', 'reach', 'repair', 'rest', 'roll', 'rub', 'rush', 'sail', 'save', 'scratch', 'search', 'serve', 'share', 'shout', 'show', 'sign', 'slip', 'smell', 'smile', 'snow', 'sound', 'spell', 'spill', 'splash', 'spot', 'spray', 'stamp', 'start', 'stay', 'step', 'stick', 'stir', 'stop', 'store', 'stretch', 'tap', 'taste', 'thank', 'tickle', 'tie', 'time', 'tip', 'touch', 'trade', 'train', 'travel', 'treat', 'trick', 'trip', 'try', 'turn', 'twist', 'type', 'use', 'visit', 'wait', 'wake', 'want', 'warm', 'warn', 'wash', 'watch', 'water', 'wave', 'whisper', 'wink', 'wipe', 'wish', 'worry', 'wrap', 'yell'],
+            '-ly': ['quick', 'slow', 'happy', 'sad', 'loud', 'soft', 'bright', 'dark', 'smooth', 'rough', 'kind', 'nice', 'bad', 'good', 'real', 'true', 'safe', 'sure', 'clear', 'fair', 'angry', 'brave', 'calm', 'careful', 'cheerful', 'clean', 'clever', 'close', 'cold', 'cool', 'correct', 'crazy', 'curious', 'dangerous', 'deep', 'different', 'difficult', 'dirty', 'easy', 'empty', 'equal', 'exact', 'excited', 'extreme', 'fast', 'final', 'fine', 'firm', 'flat', 'free', 'fresh', 'full', 'funny', 'gentle', 'glad', 'great', 'hard', 'healthy', 'heavy', 'high', 'honest', 'hot', 'huge', 'hungry', 'important', 'large', 'late', 'lazy', 'light', 'little', 'lonely', 'long', 'loose', 'low', 'lucky', 'mad', 'main', 'mean', 'neat', 'nervous', 'new', 'normal', 'old', 'open', 'perfect', 'plain', 'polite', 'poor', 'popular', 'powerful', 'pretty', 'proud', 'pure', 'quiet', 'rapid', 'rare', 'ready', 'recent', 'regular', 'rich', 'right', 'serious', 'sharp', 'short', 'sick', 'silly', 'simple', 'small', 'smart', 'special', 'strange', 'strong', 'sudden', 'sweet', 'tall', 'thick', 'thin', 'tight', 'tiny', 'tough', 'warm', 'weak', 'wide', 'wild', 'wise', 'wonderful', 'wrong', 'young']
+        };
+
+        // Hints for each affix
+        const hints = {
+            're-': 'Try: read, write, do',
+            'un-': 'Try: happy, fair, safe',
+            'pre-': 'Try: view, heat, cook',
+            '-ing': 'Try: run, jump, play',
+            '-ed': 'Try: walk, talk, work',
+            '-ly': 'Try: quick, happy, loud'
+        };
+
+        function startGame() {
+            const nameInput = document.getElementById('studentName');
+            const classInput = document.getElementById('studentClass');
+            
+            studentName = nameInput.value.trim();
+            studentClass = classInput.value.trim();
+            
+            if (!studentName || !studentClass) {
+                showStartFeedback('Please enter both your name and class!', 'error');
+                return;
+            }
+            
+            // Hide student info and show game
+            document.getElementById('studentInfo').style.display = 'none';
+            document.getElementById('gameMain').style.display = 'block';
+            
+            // Initialize game
+            initializeGame();
+        }
+
+        function initializeGame() {
+            // Reset game state
+            selectedAffix = '';
+            selectedType = '';
+            score = 0;
+            builtWords = [];
+            timeRemaining = 180; // 3 minutes
+            
+            // Setup UI
+            setupAffixButtons();
+            setupWordInput();
+            updateScore();
+            startTimer();
+            
+            // Reset displays
+            document.getElementById('wordsList').innerHTML = '';
+            document.getElementById('hintText').textContent = 'Select a prefix or suffix to get a hint!';
+            hideFeedback();
+        }
+
+        function setupAffixButtons() {
+            const affixButtons = document.querySelectorAll('.affix-btn');
+            affixButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove selected class from all buttons
+                    affixButtons.forEach(btn => btn.classList.remove('selected'));
+                    
+                    // Add selected class to clicked button
+                    this.classList.add('selected');
+                    
+                    selectedAffix = this.dataset.affix;
+                    selectedType = this.dataset.type;
+                    
+                    // Update placeholder text
+                    const input = document.getElementById('wordInput');
+                    if (selectedType === 'prefix') {
+                        input.placeholder = `Enter a root word to go with "${selectedAffix}"...`;
+                    } else {
+                        input.placeholder = `Enter a root word to go with "${selectedAffix}"...`;
+                    }
+                    
+                    // Show hint
+                    showHint();
+                    
+                    // Clear feedback
+                    hideFeedback();
+                    
+                    // Focus input
+                    input.focus();
+                });
+            });
+        }
+
+        function setupWordInput() {
+            const wordInput = document.getElementById('wordInput');
+            wordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitWord();
+                }
+            });
+        }
+
+        function showHint() {
+            const hintText = document.getElementById('hintText');
+            if (selectedAffix && hints[selectedAffix]) {
+                hintText.textContent = hints[selectedAffix];
+            }
+        }
+
+
+
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function submitWord() {
+            const input = document.getElementById('wordInput');
+            const rootWord = input.value.trim().toLowerCase();
+            
+            if (!selectedAffix) {
+                showFeedback('Please select a prefix or suffix first!', 'error');
+                return;
+            }
+            
+            if (!rootWord) {
+                showFeedback('Please enter a root word!', 'error');
+                return;
+            }
+            
+            // Check if the word combination is valid
+            if (validWords[selectedAffix] && validWords[selectedAffix].includes(rootWord)) {
+                const fullWord = selectedType === 'prefix' ? selectedAffix + rootWord : rootWord + selectedAffix;
+                
+                // Check if word was already used
+                if (builtWords.includes(fullWord)) {
+                    showFeedback('You already built that word! Try a different one.', 'error');
+                    return;
+                }
+                
+                // Add the word and build tower block
+                builtWords.push(fullWord);
+                addTowerBlock(fullWord);
+                updateScore();
+                addToWordsList(fullWord);
+                showFeedback(`Excellent! "${fullWord}" added to your tower! 🎉`, 'success');
+                
+                // Clear input
+                input.value = '';
+                
+                // Update certificate button
+                updateCertificateButton();
+                
+            } else {
+                showFeedback(`"${selectedAffix}" doesn't work with "${rootWord}". Try a different root word!`, 'error');
+            }
+        }
+
+        function addTowerBlock(word) {
+            const tower = document.getElementById('tower');
+            const block = document.createElement('div');
+            block.className = 'tower-block';
+            block.textContent = word;
+            
+            // Insert before the base (which is the last child)
+            tower.insertBefore(block, tower.lastElementChild);
+        }
+
+        function updateScore() {
+            score = builtWords.length;
+            document.getElementById('score').textContent = score;
+        }
+
+        function addToWordsList(word) {
+            const wordsList = document.getElementById('wordsList');
+            const wordItem = document.createElement('span');
+            wordItem.className = 'word-item';
+            wordItem.textContent = word;
+            wordsList.appendChild(wordItem);
+        }
+
+        function updateCertificateButton() {
+            const btn = document.getElementById('certificateBtn');
+            if (score >= 5) {
+                btn.disabled = false;
+                btn.textContent = '🏆 Get Your Certificate!';
+            } else {
+                btn.textContent = `🏆 Get Certificate (Need ${5 - score} more blocks)`;
+            }
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            
+            // Disable all game inputs
+            document.getElementById('wordInput').disabled = true;
+            document.querySelector('.submit-btn').disabled = true;
+            document.querySelectorAll('.affix-btn').forEach(btn => btn.disabled = true);
+            
+            // Show time's up message
+            showFeedback(`⏰ Time's up! You built a ${score}-block tower! Great job! 🎉`, 'success');
+            
+            // Enable certificate and prompt to download
+            const btn = document.getElementById('certificateBtn');
+            if (score > 0) {
+                btn.disabled = false;
+                btn.textContent = '🏆 Download Your Certificate!';
+                btn.style.animation = 'pulse 2s infinite';
+                
+                // Show prominent download prompt as popup
+                setTimeout(() => {
+                    showPopupMessage(`🎓 Great work ${studentName}!<br>Click the certificate button to download your achievement!`);
+                }, 2000);
+            } else {
+                btn.textContent = '🏆 No words built - try again!';
+            }
+        }
+
+        function showStartFeedback(message, type) {
+            const feedback = document.getElementById('startFeedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            feedback.style.display = 'block';
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = `feedback ${type}`;
+            feedback.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    hideFeedback();
+                }, 3000);
+            }
+        }
+
+        function hideFeedback() {
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'none';
+        }
+
+        function showPopupMessage(message) {
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'popup-overlay';
+            
+            // Create popup message
+            const popup = document.createElement('div');
+            popup.className = 'popup-message';
+            popup.innerHTML = message;
+            
+            // Add to page
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (document.body.contains(overlay)) {
+                    document.body.removeChild(overlay);
+                }
+                if (document.body.contains(popup)) {
+                    document.body.removeChild(popup);
+                }
+            }, 5000);
+        }
+
+        function generateCertificate() {
+            if (score === 0) {
+                showFeedback('Build at least one word to earn a certificate!', 'error');
+                return;
+            }
+            
+            // Create a temporary div to render the certificate (A4 Landscape: 1123x794 pixels at 96 DPI)
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            tempDiv.style.width = '1123px';
+            tempDiv.style.height = '794px';
+            tempDiv.style.background = 'white';
+            tempDiv.style.padding = '40px';
+            tempDiv.style.fontFamily = 'Times New Roman, serif';
+            tempDiv.style.textAlign = 'center';
+            tempDiv.style.border = '12px solid #FFD700';
+            tempDiv.style.borderRadius = '20px';
+            tempDiv.style.boxShadow = '0 20px 40px rgba(0,0,0,0.2)';
+            tempDiv.style.boxSizing = 'border-box';
+            
+            // Calculate dynamic font sizes based on content
+            const wordCount = builtWords.length;
+            const titleSize = wordCount > 15 ? '2.2rem' : '2.8rem';
+            const subtitleSize = wordCount > 15 ? '1.4rem' : '1.8rem';
+            const nameSize = wordCount > 15 ? '2rem' : '2.5rem';
+            const textSize = wordCount > 15 ? '1rem' : '1.2rem';
+            const wordItemSize = wordCount > 20 ? '0.9rem' : wordCount > 15 ? '1rem' : '1.1rem';
+            const wordPadding = wordCount > 20 ? '6px 10px' : '8px 12px';
+            
+            tempDiv.innerHTML = `
+                <div style="position: relative; height: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center;">
+                    <!-- Left Column -->
+                    <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; padding-right: 15px;">
+                        <div style="position: absolute; top: -25px; left: -25px; font-size: 3rem;">🏗️</div>
+                        
+                        <h1 style="color: #2c3e50; font-size: ${titleSize}; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); line-height: 1.1;">🏆 CERTIFICATE OF ACHIEVEMENT 🏆</h1>
+                        
+                        <h2 style="color: #e74c3c; font-size: ${subtitleSize}; margin: 15px 0;">Word-Build Tower Master</h2>
+                        
+                        <p style="font-size: ${textSize}; color: #34495e; margin: 10px 0;">This certifies that</p>
+                        
+                        <h2 style="color: #2c3e50; text-decoration: underline; font-family: 'Brush Script MT', cursive; font-size: ${nameSize}; margin: 15px 0; line-height: 1.2;">${studentName}</h2>
+                        
+                        <p style="font-size: ${Math.max(0.9, parseFloat(textSize) - 0.2)}rem; color: #7f8c8d; margin: 8px 0;">Class: ${studentClass}</p>
+                        
+                        <p style="font-size: ${textSize}; color: #34495e; margin: 12px 0; line-height: 1.3;">has successfully completed the Word-Build Tower challenge</p>
+                        
+                        <div style="background: linear-gradient(45deg, #FF6B6B, #4ECDC4); color: white; padding: 15px; border-radius: 15px; margin: 15px 0; font-size: ${Math.max(1.1, parseFloat(textSize) + 0.1)}rem; font-weight: bold;">
+                            🏗️ Built a ${score}-block tower! 🏗️
+                        </div>
+                        
+                        <p style="font-size: ${textSize}; color: #34495e; margin: 12px 0;">Demonstrating excellent skills in:</p>
+                        <p style="font-size: ${Math.max(0.9, parseFloat(textSize) - 0.1)}rem; color: #34495e; margin: 8px 0; line-height: 1.4;">✓ Spelling & Word Formation<br>
+                        ✓ Understanding Prefixes & Suffixes<br>
+                        ✓ Creative Thinking & Achievement</p>
+                        
+                        <p style="margin: 15px 0; font-style: italic; color: #7f8c8d; font-size: ${Math.max(0.9, parseFloat(textSize) - 0.1)}rem;">Awarded on ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    
+                    <!-- Right Column - Words Built -->
+                    <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; padding-left: 15px;">
+                        <div style="position: absolute; top: -25px; right: -25px; font-size: 3rem;">🏆</div>
+                        
+                        <h3 style="font-size: ${Math.max(1.2, parseFloat(textSize) + 0.2)}rem; color: #34495e; margin-bottom: 15px; font-weight: bold;">🎯 Words Successfully Built:</h3>
+                        
+                        <div style="background: #ecf0f1; padding: 20px; border-radius: 15px; border: 3px solid #bdc3c7; max-height: 450px; overflow-y: auto; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: 6px;">
+                            ${builtWords.map(word => `<span style="display: inline-block; background: linear-gradient(45deg, #4ECDC4, #44A08D); color: white; padding: ${wordPadding}; border-radius: 15px; font-weight: bold; font-size: ${wordItemSize}; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${word}</span>`).join('')}
+                        </div>
+                        
+                        <div style="margin-top: 20px; text-align: center;">
+                            <p style="font-size: ${Math.max(1, parseFloat(textSize) - 0.1)}rem; color: #7f8c8d; margin: 10px 0;">
+                                🎓 Keep building your vocabulary tower! 🎓
+                            </p>
+                            <div style="background: linear-gradient(45deg, #FFD700, #FFA500); color: white; padding: 10px 20px; border-radius: 25px; display: inline-block; font-weight: bold; font-size: ${Math.max(1, parseFloat(textSize) - 0.1)}rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                                🌟 Total Words: ${score} 🌟
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(tempDiv);
+            
+            // Use html2canvas to convert to image and download (A4 Landscape dimensions)
+            html2canvas(tempDiv, {
+                width: 1123,
+                height: 794,
+                scale: 2,
+                backgroundColor: '#ffffff',
+                useCORS: true
+            }).then(canvas => {
+                // Remove temporary div
+                document.body.removeChild(tempDiv);
+                
+                // Create download link
+                const link = document.createElement('a');
+                link.download = `${studentName.replace(/\s+/g, '_')}_Certificate.png`;
+                link.href = canvas.toDataURL('image/png');
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showFeedback('🎉 Certificate downloaded successfully!', 'success');
+            }).catch(error => {
+                // Fallback to opening in new window if html2canvas fails
+                document.body.removeChild(tempDiv);
+                
+                const certificateHTML = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>Word-Build Tower Certificate</title>
+                        <style>
+                            body {
+                                font-family: 'Times New Roman', serif;
+                                margin: 0;
+                                padding: 40px;
+                                background: linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #FFE4B5 100%);
+                                min-height: 100vh;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                            }
+                            .certificate {
+                                background: white;
+                                padding: 60px;
+                                border-radius: 20px;
+                                box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+                                text-align: center;
+                                max-width: 800px;
+                                border: 10px solid #FFD700;
+                                position: relative;
+                            }
+                            .certificate::before {
+                                content: '🏗️';
+                                position: absolute;
+                                top: 20px;
+                                left: 30px;
+                                font-size: 3rem;
+                            }
+                            .certificate::after {
+                                content: '🏆';
+                                position: absolute;
+                                top: 20px;
+                                right: 30px;
+                                font-size: 3rem;
+                            }
+                            .certificate h1 {
+                                color: #2c3e50;
+                                font-size: 3rem;
+                                margin-bottom: 20px;
+                                text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+                            }
+                            .certificate h2 {
+                                color: #e74c3c;
+                                font-size: 2rem;
+                                margin: 30px 0;
+                            }
+                            .certificate p {
+                                font-size: 1.3rem;
+                                color: #34495e;
+                                margin: 20px 0;
+                                line-height: 1.6;
+                            }
+                            .achievement {
+                                background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+                                color: white;
+                                padding: 20px;
+                                border-radius: 15px;
+                                margin: 30px 0;
+                                font-size: 1.5rem;
+                                font-weight: bold;
+                            }
+                            .date {
+                                margin-top: 40px;
+                                font-style: italic;
+                                color: #7f8c8d;
+                            }
+                            .words-built {
+                                background: #ecf0f1;
+                                padding: 20px;
+                                border-radius: 10px;
+                                margin: 20px 0;
+                            }
+                            .word-item {
+                                display: inline-block;
+                                background: linear-gradient(45deg, #4ECDC4, #44A08D);
+                                color: white;
+                                padding: 8px 12px;
+                                margin: 3px;
+                                border-radius: 15px;
+                                font-weight: bold;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="certificate">
+                            <h1>🏆 CERTIFICATE OF ACHIEVEMENT 🏆</h1>
+                            <h2>Word-Build Tower Master</h2>
+                            <p>This certifies that</p>
+                            <h2 style="color: #2c3e50; text-decoration: underline; font-family: 'Brush Script MT', cursive;">${studentName}</h2>
+                            <p style="font-size: 1.1rem; color: #7f8c8d;">Class: ${studentClass}</p>
+                            <p>has successfully completed the Word-Build Tower challenge</p>
+                            
+                            <div class="achievement">
+                                🏗️ Built a magnificent ${score}-block tower! 🏗️
+                            </div>
+                            
+                            <p><strong>Words Successfully Built:</strong></p>
+                            <div class="words-built">
+                                ${builtWords.map(word => `<span class="word-item">${word}</span>`).join('')}
+                            </div>
+                            
+                            <p>Demonstrating excellent skills in:</p>
+                            <p>✓ Spelling and Word Formation<br>
+                            ✓ Understanding Prefixes and Suffixes<br>
+                            ✓ Creative Thinking<br>
+                            ✓ Persistence and Achievement</p>
+                            
+                            <p class="date">Awarded on ${new Date().toLocaleDateString()}</p>
+                            
+                            <p style="margin-top: 40px; font-size: 1rem; color: #7f8c8d;">
+                                🎓 Keep building your vocabulary tower! 🎓
+                            </p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                const certificateWindow = window.open('', '_blank');
+                certificateWindow.document.write(certificateHTML);
+                certificateWindow.document.close();
+                
+                showFeedback('🎉 Certificate opened in new window - right-click to save as image!', 'success');
+            });
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96d7acba803f40fe',t:'MTc1NDkxNDY5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

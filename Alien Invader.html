@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alien Grammar Hunt</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, #0a0a2e, #16213e, #1a1a3a);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Animated starfield background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        /* Homepage styles */
+        .homepage {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        .homepage.hidden {
+            display: none;
+        }
+        
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #00ff88;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            from { filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.5)); }
+            to { filter: drop-shadow(0 0 30px rgba(0, 204, 255, 0.8)); }
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 1rem;
+            max-width: 600px;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .instructions h2 {
+            color: #00ff88;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.3rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .instructions li::before {
+            content: "👾";
+            position: absolute;
+            left: 0;
+        }
+        
+        .student-form {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ccff;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+            min-width: 300px;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+            color: #00ccff;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid #00ccff;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+        
+        .start-button {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #000;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            min-width: 200px;
+        }
+        
+        .start-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.4);
+        }
+        
+        .start-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .start-button:not(:disabled) {
+            animation: buttonPulse 2s infinite;
+        }
+        
+        @keyframes buttonPulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 255, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+        }
+        
+        /* Game area styles */
+        .game-area {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: none;
+            padding: 10px;
+            overflow: hidden;
+        }
+        
+        .game-area.active {
+            display: block;
+        }
+        
+        .game-hud {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            height: 60px;
+        }
+        
+        .level-info {
+            text-align: center;
+            color: #ffaa00;
+            font-size: 0.7rem;
+        }
+        
+        .level-name {
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+        }
+        
+        .level-description {
+            font-size: 0.6rem;
+            opacity: 0.8;
+        }
+        
+        .hud-item {
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .score { color: #00ff88; }
+        .health { color: #ff6b6b; }
+        .level { color: #ffaa00; }
+        .timer { color: #ff6b6b; font-weight: 700; }
+        .timer.warning { animation: timerWarning 1s infinite; }
+        .player-info { color: #00ccff; font-size: 0.7rem; }
+        
+        @keyframes timerWarning {
+            0%, 100% { color: #ff6b6b; }
+            50% { color: #ffaa00; }
+        }
+        
+        /* Alien styles */
+        .alien {
+            position: absolute;
+            width: 100px;
+            height: 120px;
+            cursor: crosshair;
+            transition: all 0.3s ease;
+            z-index: 50;
+            animation: alienFloat 3s ease-in-out infinite;
+        }
+        
+        .alien:hover {
+            transform: scale(1.15) rotate(5deg);
+            filter: brightness(1.2);
+        }
+        
+        @keyframes alienFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        
+        .alien-body {
+            width: 70px;
+            height: 60px;
+            margin: 0 auto;
+            position: relative;
+            background: linear-gradient(145deg, #00ff88, #00cc66);
+            border-radius: 50% 50% 40% 40%;
+            box-shadow: 
+                inset 0 -10px 20px rgba(0, 0, 0, 0.3),
+                0 5px 15px rgba(0, 255, 136, 0.4);
+            animation: alienPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes alienPulse {
+            0%, 100% { box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 255, 136, 0.4); }
+            50% { box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.3), 0 5px 25px rgba(0, 255, 136, 0.6); }
+        }
+        
+        .alien-eyes {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+        }
+        
+        .alien-eye {
+            width: 18px;
+            height: 18px;
+            background: #000;
+            border-radius: 50%;
+            position: relative;
+            animation: alienBlink 4s infinite;
+        }
+        
+        .alien-eye::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 6px;
+            height: 6px;
+            background: #ff0066;
+            border-radius: 50%;
+            animation: eyeGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes alienBlink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+        
+        @keyframes eyeGlow {
+            0% { box-shadow: 0 0 5px #ff0066; }
+            100% { box-shadow: 0 0 15px #ff0066, 0 0 25px #ff0066; }
+        }
+        
+        .alien-mouth {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 8px;
+            background: #000;
+            border-radius: 0 0 15px 15px;
+            animation: alienTalk 3s ease-in-out infinite;
+        }
+        
+        @keyframes alienTalk {
+            0%, 70%, 100% { transform: translateX(-50%) scaleY(1); }
+            85% { transform: translateX(-50%) scaleY(1.5); }
+        }
+        
+        .alien-antennae {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+        }
+        
+        .antenna {
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(to top, #00ff88, #00ccff);
+            position: relative;
+            animation: antennaWave 2.5s ease-in-out infinite;
+        }
+        
+        .antenna:nth-child(1) { animation-delay: 0s; }
+        .antenna:nth-child(2) { animation-delay: 0.5s; }
+        
+        @keyframes antennaWave {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(15deg); }
+        }
+        
+        .antenna::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -3px;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #00ccff, #0099cc);
+            border-radius: 50%;
+            animation: antennaTip 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes antennaTip {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px #00ccff; }
+            50% { transform: scale(1.3); box-shadow: 0 0 15px #00ccff; }
+        }
+        
+        .alien-arms {
+            position: absolute;
+            top: 30px;
+            width: 100%;
+            height: 40px;
+        }
+        
+        .alien-arm {
+            position: absolute;
+            width: 25px;
+            height: 8px;
+            background: linear-gradient(90deg, #00ff88, #00cc66);
+            border-radius: 10px;
+            animation: alienWave 3s ease-in-out infinite;
+        }
+        
+        .alien-arm.left {
+            left: -15px;
+            transform-origin: right center;
+            animation-delay: 0s;
+        }
+        
+        .alien-arm.right {
+            right: -15px;
+            transform-origin: left center;
+            animation-delay: 1s;
+        }
+        
+        @keyframes alienWave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-20deg); }
+            75% { transform: rotate(20deg); }
+        }
+        
+        .sentence-bubble {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #666;
+            border-radius: 8px;
+            padding: 6px;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            text-align: center;
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.2;
+        }
+        
+        /* Feedback and effects */
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: 900;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .feedback.show {
+            animation: showFeedback 1.5s ease-out forwards;
+        }
+        
+        @keyframes showFeedback {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        .explosion {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 150;
+        }
+        
+        .explosion.correct {
+            background: radial-gradient(circle, #00ff88, transparent);
+            animation: explode 0.6s ease-out forwards;
+        }
+        
+        .explosion.incorrect {
+            background: radial-gradient(circle, #ff6b6b, transparent);
+            animation: explode 0.6s ease-out forwards;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        /* Level announcement screen */
+        .level-announcement {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 400;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .level-announcement.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .level-announcement h2 {
+            font-size: 3rem;
+            color: #ffaa00;
+            margin-bottom: 1rem;
+            text-align: center;
+            animation: levelTitleGlow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes levelTitleGlow {
+            from { text-shadow: 0 0 20px rgba(255, 170, 0, 0.5); }
+            to { text-shadow: 0 0 40px rgba(255, 170, 0, 0.8); }
+        }
+        
+        .level-announcement .level-details {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ffaa00;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+        
+        .level-announcement .level-details h3 {
+            color: #00ff88;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .level-announcement .level-details p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+        
+        .level-announcement .countdown {
+            font-size: 1.5rem;
+            color: #00ccff;
+            font-weight: 700;
+        }
+
+        /* Game over screen */
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .game-over.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .game-over h2 {
+            font-size: 3rem;
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+        }
+        
+        .game-over p {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .game-over-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .game-button {
+            background: linear-gradient(45deg, #00ccff, #0099cc);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .game-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 204, 255, 0.4);
+        }
+        
+        .download-button {
+            background: linear-gradient(45deg, #ffaa00, #ff8800);
+        }
+        
+        .download-button:hover {
+            box-shadow: 0 5px 15px rgba(255, 170, 0, 0.4);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 1.8rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .instructions, .student-form {
+                margin: 0 10px 0.5rem;
+                padding: 0.8rem;
+                max-width: calc(100vw - 20px);
+            }
+            
+            .instructions ul {
+                font-size: 0.8rem;
+            }
+            
+            .game-hud {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+                font-size: 0.7rem;
+                height: auto;
+                min-height: 60px;
+                padding: 0.3rem;
+            }
+            
+            .hud-item {
+                font-size: 0.7rem;
+            }
+            
+            .level-info {
+                font-size: 0.6rem;
+                text-align: center;
+                width: 100%;
+                order: -1;
+            }
+            
+            .alien {
+                width: 80px;
+                height: 95px;
+            }
+            
+            .alien-body {
+                width: 50px;
+                height: 42px;
+            }
+            
+            .sentence-bubble {
+                font-size: 0.6rem;
+                padding: 4px;
+                min-height: 25px;
+                line-height: 1.1;
+            }
+            
+            .feedback {
+                font-size: 1.5rem;
+            }
+            
+            .level-announcement h2 {
+                font-size: 2rem;
+            }
+            
+            .level-announcement .level-details {
+                padding: 1rem;
+                margin: 0 10px 1rem;
+                max-width: calc(100vw - 20px);
+            }
+            
+            .game-over h2 {
+                font-size: 2rem;
+            }
+            
+            .game-over-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .game-button {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 1.5rem;
+            }
+            
+            .instructions, .student-form {
+                margin: 0 5px 0.5rem;
+                padding: 0.6rem;
+            }
+            
+            .instructions ul {
+                font-size: 0.75rem;
+            }
+            
+            .form-group input {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .start-button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                min-width: 180px;
+            }
+            
+            .game-hud {
+                font-size: 0.65rem;
+                padding: 0.2rem;
+            }
+            
+            .alien {
+                width: 70px;
+                height: 85px;
+            }
+            
+            .alien-body {
+                width: 45px;
+                height: 38px;
+            }
+            
+            .sentence-bubble {
+                font-size: 0.55rem;
+                padding: 3px;
+                min-height: 22px;
+            }
+            
+            .level-announcement h2 {
+                font-size: 1.8rem;
+            }
+            
+            .level-announcement .level-details h3 {
+                font-size: 1.2rem;
+            }
+            
+            .level-announcement .level-details p {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated starfield -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Homepage -->
+    <div class="homepage" id="homepage">
+        <h1 class="game-title">👾 ALIEN GRAMMAR HUNT 👾</h1>
+        
+        <div class="instructions">
+            <h2>🚀 Mission Briefing</h2>
+            <ul>
+                <li><strong>Objective:</strong> Shoot aliens with CORRECT grammar sentences!</li>
+                <li><strong>Controls:</strong> Click on aliens to shoot them</li>
+                <li><strong>Scoring:</strong> +15 points for correct, -25 health for wrong</li>
+                <li><strong>Warning:</strong> Only shoot aliens with grammatically correct sentences!</li>
+                <li><strong>Survival:</strong> Game ends when health reaches 0</li>
+            </ul>
+        </div>
+        
+        <div class="student-form">
+            <div class="form-group">
+                <label for="playerName">Student Name:</label>
+                <input type="text" id="playerName" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="playerClass">Class:</label>
+                <input type="text" id="playerClass" placeholder="e.g., 9A, 9B, 9C">
+            </div>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <label style="color: #00ccff; font-size: 0.9rem;">🔊 Sound Effects:</label>
+                <button id="soundToggle" onclick="toggleSound()" style="background: linear-gradient(45deg, #00ff88, #00ccff); color: #000; border: none; padding: 0.3rem 0.8rem; border-radius: 5px; font-family: 'Orbitron', monospace; font-weight: 700; cursor: pointer; font-size: 0.8rem;">ON</button>
+            </div>
+            <button class="start-button" id="startButton" onclick="startGame()" disabled>
+                🚀 ENTER NAME & CLASS FIRST 🚀
+            </button>
+        </div>
+    </div>
+    
+    <!-- Game Area -->
+    <div class="game-area" id="gameArea">
+        <div class="game-hud">
+            <div class="player-info">
+                <div>Player: <span id="hudPlayerName">-</span></div>
+                <div>Class: <span id="hudPlayerClass">-</span></div>
+            </div>
+            <div class="level-info">
+                <div class="level-name" id="levelName">Present Tense Mastery</div>
+                <div class="level-description" id="levelDescription">Master present simple and continuous tenses</div>
+            </div>
+            <div class="score">Score: <span id="scoreDisplay">0</span></div>
+            <div class="timer">Time: <span id="timerDisplay">60</span>s</div>
+            <div class="health">Health: <span id="healthDisplay">100</span></div>
+        </div>
+        
+        <div class="feedback" id="feedback"></div>
+    </div>
+    
+    <!-- Level Announcement Screen -->
+    <div class="level-announcement" id="levelAnnouncementScreen">
+        <h2 id="levelAnnouncementTitle">LEVEL 1</h2>
+        <div class="level-details">
+            <h3 id="levelAnnouncementName">Present Tense Mastery</h3>
+            <p id="levelAnnouncementDescription">Master present simple and continuous tenses</p>
+            <p>⏱️ Time Limit: <span id="levelTimeLimit">45</span> seconds</p>
+            <p>🎯 Target: Identify grammatically correct sentences</p>
+        </div>
+        <div class="countdown">Starting in <span id="levelCountdown">3</span>...</div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="game-over" id="gameOverScreen">
+        <h2 id="gameOverTitle">Mission Complete!</h2>
+        <p>Player: <span id="finalPlayerName">-</span></p>
+        <p>Class: <span id="finalPlayerClass">-</span></p>
+        <p>Total Score: <span id="finalScore">0</span></p>
+        <p>Levels Completed: <span id="levelsCompleted">0</span>/7</p>
+        <p>Accuracy: <span id="finalAccuracy">0</span>%</p>
+        <div class="game-over-buttons">
+            <button class="game-button" onclick="goHome()">🏠 Back Home</button>
+            <button class="game-button" onclick="restartGame()">🔄 Play Again</button>
+            <button class="game-button download-button" onclick="downloadResults()">📊 Download Results</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let gameState = {
+            score: 0,
+            health: 100,
+            level: 1,
+            isActive: false,
+            playerName: '',
+            playerClass: '',
+            alienCount: 0,
+            spawnRate: 2000, // Start slower for level 1
+            timeLeft: 60,
+            currentLevelStartTime: 0,
+            levelScores: [],
+            totalCorrect: 0,
+            totalIncorrect: 0,
+            soundEnabled: true
+        };
+
+        // Audio context and sound effects
+        let audioContext;
+        let sounds = {};
+
+        // Initialize audio system
+        function initializeAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                createSoundEffects();
+            } catch (error) {
+                console.log('Audio not supported');
+                gameState.soundEnabled = false;
+            }
+        }
+
+        // Create retro 8-bit sound effects
+        function createSoundEffects() {
+            // Enhanced arcade laser shoot sound with echo
+            sounds.shoot = () => {
+                if (!gameState.soundEnabled) return;
+                
+                // Main laser sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(1400, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.08);
+                oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.15);
+                
+                gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+                
+                // Echo effect
+                setTimeout(() => {
+                    const echoOsc = audioContext.createOscillator();
+                    const echoGain = audioContext.createGain();
+                    
+                    echoOsc.connect(echoGain);
+                    echoGain.connect(audioContext.destination);
+                    
+                    echoOsc.type = 'square';
+                    echoOsc.frequency.setValueAtTime(700, audioContext.currentTime);
+                    echoOsc.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
+                    
+                    echoGain.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    echoGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    
+                    echoOsc.start(audioContext.currentTime);
+                    echoOsc.stop(audioContext.currentTime + 0.1);
+                }, 80);
+            };
+
+            // Enhanced power-up sound with sparkle effect
+            sounds.correct = () => {
+                if (!gameState.soundEnabled) return;
+                
+                // Main ascending melody
+                const notes = [523, 659, 784, 1047, 1319]; // C5, E5, G5, C6, E6
+                notes.forEach((freq, index) => {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                        
+                        gainNode.gain.setValueAtTime(0.35, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.15);
+                    }, index * 70);
+                });
+                
+                // Sparkle effect
+                setTimeout(() => {
+                    for (let i = 0; i < 3; i++) {
+                        setTimeout(() => {
+                            const sparkle = audioContext.createOscillator();
+                            const sparkleGain = audioContext.createGain();
+                            
+                            sparkle.connect(sparkleGain);
+                            sparkleGain.connect(audioContext.destination);
+                            
+                            sparkle.type = 'sine';
+                            sparkle.frequency.setValueAtTime(2093 + Math.random() * 500, audioContext.currentTime);
+                            
+                            sparkleGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+                            sparkleGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+                            
+                            sparkle.start(audioContext.currentTime);
+                            sparkle.stop(audioContext.currentTime + 0.08);
+                        }, i * 40);
+                    }
+                }, 300);
+            };
+
+            // Enhanced damage sound with rumble
+            sounds.wrong = () => {
+                if (!gameState.soundEnabled) return;
+                
+                // Main damage sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(250, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(120, audioContext.currentTime + 0.3);
+                oscillator.frequency.exponentialRampToValueAtTime(60, audioContext.currentTime + 0.6);
+                
+                gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.6);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.6);
+                
+                // Rumble effect
+                setTimeout(() => {
+                    const rumble = audioContext.createOscillator();
+                    const rumbleGain = audioContext.createGain();
+                    
+                    rumble.connect(rumbleGain);
+                    rumbleGain.connect(audioContext.destination);
+                    
+                    rumble.type = 'square';
+                    rumble.frequency.setValueAtTime(80, audioContext.currentTime);
+                    
+                    rumbleGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    rumbleGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    rumble.start(audioContext.currentTime);
+                    rumble.stop(audioContext.currentTime + 0.2);
+                }, 100);
+            };
+
+            // Level complete fanfare
+            sounds.levelComplete = () => {
+                if (!gameState.soundEnabled) return;
+                
+                // Victory fanfare melody
+                const melody = [523, 659, 784, 1047, 784, 1047, 1319]; // C5, E5, G5, C6, G5, C6, E6
+                melody.forEach((freq, index) => {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                        
+                        const duration = index === melody.length - 1 ? 0.4 : 0.2;
+                        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + duration);
+                    }, index * 150);
+                });
+                
+                // Harmony layer
+                setTimeout(() => {
+                    const harmony = [392, 523, 659, 784, 659, 784, 1047]; // G4, C5, E5, G5, E5, G5, C6
+                    harmony.forEach((freq, index) => {
+                        setTimeout(() => {
+                            const oscillator = audioContext.createOscillator();
+                            const gainNode = audioContext.createGain();
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
+                            
+                            oscillator.type = 'triangle';
+                            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                            
+                            const duration = index === harmony.length - 1 ? 0.4 : 0.2;
+                            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                            
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + duration);
+                        }, index * 150);
+                    });
+                }, 50);
+            };
+
+            // Enhanced game over sound
+            sounds.gameOver = () => {
+                if (!gameState.soundEnabled) return;
+                
+                // Main descending melody
+                const notes = [330, 277, 233, 196, 165]; // E4, C#4, A#3, G3, E3
+                notes.forEach((freq, index) => {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.type = 'triangle';
+                        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                        
+                        const duration = index === notes.length - 1 ? 1.2 : 0.4;
+                        gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + duration);
+                    }, index * 300);
+                });
+                
+                // Bass accompaniment
+                setTimeout(() => {
+                    const bass = [165, 139, 117, 98, 82]; // E3, C#3, A#2, G2, E2
+                    bass.forEach((freq, index) => {
+                        setTimeout(() => {
+                            const oscillator = audioContext.createOscillator();
+                            const gainNode = audioContext.createGain();
+                            
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioContext.destination);
+                            
+                            oscillator.type = 'square';
+                            oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                            
+                            const duration = index === bass.length - 1 ? 1.2 : 0.4;
+                            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                            
+                            oscillator.start(audioContext.currentTime);
+                            oscillator.stop(audioContext.currentTime + duration);
+                        }, index * 300);
+                    });
+                }, 100);
+            };
+
+            // Enhanced alien spawn sound with warble
+            sounds.alienSpawn = () => {
+                if (!gameState.soundEnabled) return;
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                const lfo = audioContext.createOscillator(); // Low frequency oscillator for warble
+                const lfoGain = audioContext.createGain();
+                
+                // Setup warble effect
+                lfo.frequency.setValueAtTime(8, audioContext.currentTime); // 8Hz warble
+                lfoGain.gain.setValueAtTime(30, audioContext.currentTime); // Warble depth
+                
+                lfo.connect(lfoGain);
+                lfoGain.connect(oscillator.frequency);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(250, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(450, audioContext.currentTime + 0.15);
+                oscillator.frequency.exponentialRampToValueAtTime(350, audioContext.currentTime + 0.25);
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+                
+                lfo.start(audioContext.currentTime);
+                oscillator.start(audioContext.currentTime);
+                
+                lfo.stop(audioContext.currentTime + 0.25);
+                oscillator.stop(audioContext.currentTime + 0.25);
+            };
+
+            // Enhanced timer warning with urgency
+            sounds.timerWarning = () => {
+                if (!gameState.soundEnabled) return;
+                
+                // Double beep for urgency
+                for (let i = 0; i < 2; i++) {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.type = 'square';
+                        oscillator.frequency.setValueAtTime(1760, audioContext.currentTime);
+                        
+                        gainNode.gain.setValueAtTime(0.25, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.08);
+                    }, i * 120);
+                }
+            };
+
+            // Game start sound
+            sounds.gameStart = () => {
+                if (!gameState.soundEnabled) return;
+                
+                // Rising startup sound
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.5);
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+                
+                // Confirmation beep
+                setTimeout(() => {
+                    const beep = audioContext.createOscillator();
+                    const beepGain = audioContext.createGain();
+                    
+                    beep.connect(beepGain);
+                    beepGain.connect(audioContext.destination);
+                    
+                    beep.type = 'square';
+                    beep.frequency.setValueAtTime(1047, audioContext.currentTime);
+                    
+                    beepGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    beepGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    
+                    beep.start(audioContext.currentTime);
+                    beep.stop(audioContext.currentTime + 0.2);
+                }, 600);
+            };
+        }
+
+        // Resume audio context (required for modern browsers)
+        function resumeAudioContext() {
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+        
+        // Level definitions with specific grammar focus
+        const grammarLevels = [
+            {
+                level: 1,
+                name: "Present Tense Mastery",
+                description: "Master present simple and continuous tenses",
+                timeLimit: 45
+            },
+            {
+                level: 2,
+                name: "Past Tense Challenge",
+                description: "Conquer past simple and continuous tenses",
+                timeLimit: 45
+            },
+            {
+                level: 3,
+                name: "Future Tense Focus",
+                description: "Navigate future tenses and predictions",
+                timeLimit: 45
+            },
+            {
+                level: 4,
+                name: "Perfect Tense Power",
+                description: "Perfect your perfect tenses",
+                timeLimit: 45
+            },
+            {
+                level: 5,
+                name: "Conditional Conquest",
+                description: "Master conditional sentences",
+                timeLimit: 45
+            },
+            {
+                level: 6,
+                name: "Passive Voice Victory",
+                description: "Dominate passive constructions",
+                timeLimit: 45
+            },
+            {
+                level: 7,
+                name: "Mixed Tense Mayhem",
+                description: "Ultimate challenge - all tenses combined!",
+                timeLimit: 45
+            }
+        ];
+
+        // Year 9 appropriate grammar sentences - progressive difficulty
+        const grammarSentences = [
+            // Level 1 - Basic Present Tense
+            { text: "She plays tennis every weekend.", correct: true, level: 1, topic: "Present simple" },
+            { text: "She play tennis every weekend.", correct: false, level: 1, topic: "Present simple" },
+            { text: "They are watching a movie right now.", correct: true, level: 1, topic: "Present continuous" },
+            { text: "They is watching a movie right now.", correct: false, level: 1, topic: "Present continuous" },
+            { text: "My brother goes to school by bus.", correct: true, level: 1, topic: "Present simple" },
+            { text: "My brother go to school by bus.", correct: false, level: 1, topic: "Present simple" },
+            { text: "The students are studying for their test.", correct: true, level: 1, topic: "Present continuous" },
+            { text: "The students is studying for their test.", correct: false, level: 1, topic: "Present continuous" },
+            { text: "I always eat breakfast before school.", correct: true, level: 1, topic: "Present simple" },
+            { text: "I always eating breakfast before school.", correct: false, level: 1, topic: "Present simple" },
+            { text: "The teacher is explaining the lesson.", correct: true, level: 1, topic: "Present continuous" },
+            { text: "The teacher explaining the lesson.", correct: false, level: 1, topic: "Present continuous" },
+            { text: "We live in a small town.", correct: true, level: 1, topic: "Present simple" },
+            { text: "We lives in a small town.", correct: false, level: 1, topic: "Present simple" },
+            { text: "The dog is running in the park.", correct: true, level: 1, topic: "Present continuous" },
+            { text: "The dog running in the park.", correct: false, level: 1, topic: "Present continuous" },
+            { text: "She doesn't like chocolate ice cream.", correct: true, level: 1, topic: "Present simple negative" },
+            { text: "She don't like chocolate ice cream.", correct: false, level: 1, topic: "Present simple negative" },
+            { text: "They are not coming to the party.", correct: true, level: 1, topic: "Present continuous negative" },
+            { text: "They not coming to the party.", correct: false, level: 1, topic: "Present continuous negative" },
+
+            // Level 2 - Basic Past Tense
+            { text: "Yesterday, I walked to school.", correct: true, level: 2, topic: "Past simple" },
+            { text: "Yesterday, I walk to school.", correct: false, level: 2, topic: "Past simple" },
+            { text: "She was reading when I called her.", correct: true, level: 2, topic: "Past continuous" },
+            { text: "She were reading when I called her.", correct: false, level: 2, topic: "Past continuous" },
+            { text: "They played football last weekend.", correct: true, level: 2, topic: "Past simple" },
+            { text: "They play football last weekend.", correct: false, level: 2, topic: "Past simple" },
+            { text: "We were watching TV at 8 o'clock.", correct: true, level: 2, topic: "Past continuous" },
+            { text: "We was watching TV at 8 o'clock.", correct: false, level: 2, topic: "Past continuous" },
+            { text: "He didn't finish his homework.", correct: true, level: 2, topic: "Past simple negative" },
+            { text: "He didn't finished his homework.", correct: false, level: 2, topic: "Past simple negative" },
+            { text: "The children were playing outside.", correct: true, level: 2, topic: "Past continuous" },
+            { text: "The children was playing outside.", correct: false, level: 2, topic: "Past continuous" },
+            { text: "I bought a new book yesterday.", correct: true, level: 2, topic: "Past simple irregular" },
+            { text: "I buyed a new book yesterday.", correct: false, level: 2, topic: "Past simple irregular" },
+            { text: "She wasn't listening to music.", correct: true, level: 2, topic: "Past continuous negative" },
+            { text: "She weren't listening to music.", correct: false, level: 2, topic: "Past continuous negative" },
+            { text: "We went to the beach last summer.", correct: true, level: 2, topic: "Past simple irregular" },
+            { text: "We goed to the beach last summer.", correct: false, level: 2, topic: "Past simple irregular" },
+            { text: "It was raining when we left home.", correct: true, level: 2, topic: "Past continuous" },
+            { text: "It were raining when we left home.", correct: false, level: 2, topic: "Past continuous" },
+
+            // Level 3 - Basic Future Tense
+            { text: "I will visit my grandparents tomorrow.", correct: true, level: 3, topic: "Future simple" },
+            { text: "I will visits my grandparents tomorrow.", correct: false, level: 3, topic: "Future simple" },
+            { text: "She is going to study medicine.", correct: true, level: 3, topic: "Future with going to" },
+            { text: "She is go to study medicine.", correct: false, level: 3, topic: "Future with going to" },
+            { text: "They will not come to the meeting.", correct: true, level: 3, topic: "Future simple negative" },
+            { text: "They will not comes to the meeting.", correct: false, level: 3, topic: "Future simple negative" },
+            { text: "We are going to watch a movie tonight.", correct: true, level: 3, topic: "Future with going to" },
+            { text: "We are going watch a movie tonight.", correct: false, level: 3, topic: "Future with going to" },
+            { text: "The train leaves at 3 PM.", correct: true, level: 3, topic: "Present simple for future" },
+            { text: "The train will leaves at 3 PM.", correct: false, level: 3, topic: "Present simple for future" },
+            { text: "I am meeting my friend later.", correct: true, level: 3, topic: "Present continuous for future" },
+            { text: "I am meet my friend later.", correct: false, level: 3, topic: "Present continuous for future" },
+            { text: "It will probably rain tomorrow.", correct: true, level: 3, topic: "Future simple with adverb" },
+            { text: "It will probably rains tomorrow.", correct: false, level: 3, topic: "Future simple with adverb" },
+            { text: "She isn't going to buy that dress.", correct: true, level: 3, topic: "Future going to negative" },
+            { text: "She isn't go to buy that dress.", correct: false, level: 3, topic: "Future going to negative" },
+            { text: "The concert starts at 7 PM tonight.", correct: true, level: 3, topic: "Present simple for scheduled future" },
+            { text: "The concert will starts at 7 PM tonight.", correct: false, level: 3, topic: "Present simple for scheduled future" },
+            { text: "We are having dinner with friends tomorrow.", correct: true, level: 3, topic: "Present continuous for arranged future" },
+            { text: "We are have dinner with friends tomorrow.", correct: false, level: 3, topic: "Present continuous for arranged future" },
+
+            // Level 4 - Present Perfect
+            { text: "I have finished my homework.", correct: true, level: 4, topic: "Present perfect" },
+            { text: "I have finish my homework.", correct: false, level: 4, topic: "Present perfect" },
+            { text: "She has lived here for five years.", correct: true, level: 4, topic: "Present perfect with for" },
+            { text: "She has live here for five years.", correct: false, level: 4, topic: "Present perfect with for" },
+            { text: "They have never been to Paris.", correct: true, level: 4, topic: "Present perfect with never" },
+            { text: "They have never be to Paris.", correct: false, level: 4, topic: "Present perfect with never" },
+            { text: "We haven't seen that movie yet.", correct: true, level: 4, topic: "Present perfect negative" },
+            { text: "We haven't saw that movie yet.", correct: false, level: 4, topic: "Present perfect negative" },
+            { text: "He has just arrived at school.", correct: true, level: 4, topic: "Present perfect with just" },
+            { text: "He has just arrive at school.", correct: false, level: 4, topic: "Present perfect with just" },
+            { text: "I have known her since childhood.", correct: true, level: 4, topic: "Present perfect with since" },
+            { text: "I have knew her since childhood.", correct: false, level: 4, topic: "Present perfect with since" },
+            { text: "The students have already submitted their projects.", correct: true, level: 4, topic: "Present perfect with already" },
+            { text: "The students have already submit their projects.", correct: false, level: 4, topic: "Present perfect with already" },
+            { text: "She hasn't called me today.", correct: true, level: 4, topic: "Present perfect negative" },
+            { text: "She hasn't call me today.", correct: false, level: 4, topic: "Present perfect negative" },
+            { text: "We have been friends for ten years.", correct: true, level: 4, topic: "Present perfect with for" },
+            { text: "We have be friends for ten years.", correct: false, level: 4, topic: "Present perfect with for" },
+            { text: "Have you ever visited London?", correct: true, level: 4, topic: "Present perfect question" },
+            { text: "Have you ever visit London?", correct: false, level: 4, topic: "Present perfect question" },
+
+            // Level 5 - Past Perfect & Conditionals
+            { text: "When I arrived, they had already left.", correct: true, level: 5, topic: "Past perfect" },
+            { text: "When I arrived, they already left.", correct: false, level: 5, topic: "Past perfect" },
+            { text: "If I study hard, I will pass the exam.", correct: true, level: 5, topic: "First conditional" },
+            { text: "If I will study hard, I will pass the exam.", correct: false, level: 5, topic: "First conditional" },
+            { text: "She had finished dinner before we came.", correct: true, level: 5, topic: "Past perfect" },
+            { text: "She finished dinner before we came.", correct: false, level: 5, topic: "Past perfect" },
+            { text: "If it rains, we won't go to the beach.", correct: true, level: 5, topic: "First conditional" },
+            { text: "If it will rain, we won't go to the beach.", correct: false, level: 5, topic: "First conditional" },
+            { text: "By the time we got there, the movie had started.", correct: true, level: 5, topic: "Past perfect" },
+            { text: "By the time we got there, the movie started.", correct: false, level: 5, topic: "Past perfect" },
+            { text: "If I were rich, I would travel the world.", correct: true, level: 5, topic: "Second conditional" },
+            { text: "If I was rich, I would travel the world.", correct: false, level: 5, topic: "Second conditional" },
+            { text: "He hadn't seen her for months.", correct: true, level: 5, topic: "Past perfect negative" },
+            { text: "He didn't see her for months.", correct: false, level: 5, topic: "Past perfect negative" },
+            { text: "If she studied more, she would get better grades.", correct: true, level: 5, topic: "Second conditional" },
+            { text: "If she would study more, she would get better grades.", correct: false, level: 5, topic: "Second conditional" },
+            { text: "I had never tasted sushi before that day.", correct: true, level: 5, topic: "Past perfect with never" },
+            { text: "I never tasted sushi before that day.", correct: false, level: 5, topic: "Past perfect with never" },
+            { text: "If we leave now, we will arrive on time.", correct: true, level: 5, topic: "First conditional" },
+            { text: "If we will leave now, we will arrive on time.", correct: false, level: 5, topic: "First conditional" },
+
+            // Level 6 - Passive Voice & Advanced Perfect
+            { text: "The book was written by Shakespeare.", correct: true, level: 6, topic: "Past passive" },
+            { text: "The book wrote by Shakespeare.", correct: false, level: 6, topic: "Past passive" },
+            { text: "The house is being painted right now.", correct: true, level: 6, topic: "Present continuous passive" },
+            { text: "The house is painting right now.", correct: false, level: 6, topic: "Present continuous passive" },
+            { text: "English is spoken all over the world.", correct: true, level: 6, topic: "Present passive" },
+            { text: "English speaks all over the world.", correct: false, level: 6, topic: "Present passive" },
+            { text: "The homework will be checked tomorrow.", correct: true, level: 6, topic: "Future passive" },
+            { text: "The homework will check tomorrow.", correct: false, level: 6, topic: "Future passive" },
+            { text: "The car has been repaired by the mechanic.", correct: true, level: 6, topic: "Present perfect passive" },
+            { text: "The car has repaired by the mechanic.", correct: false, level: 6, topic: "Present perfect passive" },
+            { text: "The letter was being written when I arrived.", correct: true, level: 6, topic: "Past continuous passive" },
+            { text: "The letter was writing when I arrived.", correct: false, level: 6, topic: "Past continuous passive" },
+            { text: "The project must be finished by Friday.", correct: true, level: 6, topic: "Modal passive" },
+            { text: "The project must finish by Friday.", correct: false, level: 6, topic: "Modal passive" },
+            { text: "The windows were cleaned yesterday.", correct: true, level: 6, topic: "Past passive" },
+            { text: "The windows cleaned yesterday.", correct: false, level: 6, topic: "Past passive" },
+            { text: "The cake is being made by my mother.", correct: true, level: 6, topic: "Present continuous passive" },
+            { text: "The cake is making by my mother.", correct: false, level: 6, topic: "Present continuous passive" },
+            { text: "The problem can be solved easily.", correct: true, level: 6, topic: "Modal passive" },
+            { text: "The problem can solve easily.", correct: false, level: 6, topic: "Modal passive" },
+
+            // Level 7 - Mixed Advanced Tenses
+            { text: "If I had studied harder, I would have passed the test.", correct: true, level: 7, topic: "Third conditional" },
+            { text: "If I would have studied harder, I would have passed the test.", correct: false, level: 7, topic: "Third conditional" },
+            { text: "By next year, I will have been learning English for five years.", correct: true, level: 7, topic: "Future perfect continuous" },
+            { text: "By next year, I will have learn English for five years.", correct: false, level: 7, topic: "Future perfect continuous" },
+            { text: "She had been waiting for two hours when he finally arrived.", correct: true, level: 7, topic: "Past perfect continuous" },
+            { text: "She had wait for two hours when he finally arrived.", correct: false, level: 7, topic: "Past perfect continuous" },
+            { text: "If you had called me, I would have helped you.", correct: true, level: 7, topic: "Third conditional" },
+            { text: "If you had called me, I will have helped you.", correct: false, level: 7, topic: "Third conditional" },
+            { text: "The building will have been completed by December.", correct: true, level: 7, topic: "Future perfect passive" },
+            { text: "The building will have complete by December.", correct: false, level: 7, topic: "Future perfect passive" },
+            { text: "I have been studying English since I was ten.", correct: true, level: 7, topic: "Present perfect continuous" },
+            { text: "I have study English since I was ten.", correct: false, level: 7, topic: "Present perfect continuous" },
+            { text: "If she hadn't missed the bus, she wouldn't have been late.", correct: true, level: 7, topic: "Third conditional" },
+            { text: "If she didn't miss the bus, she wouldn't have been late.", correct: false, level: 7, topic: "Third conditional" },
+            { text: "The report had been written before the meeting started.", correct: true, level: 7, topic: "Past perfect passive" },
+            { text: "The report had written before the meeting started.", correct: false, level: 7, topic: "Past perfect passive" },
+            { text: "They will have been traveling for 12 hours by the time they arrive.", correct: true, level: 7, topic: "Future perfect continuous" },
+            { text: "They will have travel for 12 hours by the time they arrive.", correct: false, level: 7, topic: "Future perfect continuous" },
+            { text: "I wish I had listened to my teacher's advice.", correct: true, level: 7, topic: "Past subjunctive wish" },
+            { text: "I wish I would have listened to my teacher's advice.", correct: false, level: 7, topic: "Past subjunctive wish" }
+        ];
+        
+        // Toggle sound effects
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            const soundButton = document.getElementById('soundToggle');
+            soundButton.textContent = gameState.soundEnabled ? 'ON' : 'OFF';
+            soundButton.style.background = gameState.soundEnabled ? 
+                'linear-gradient(45deg, #00ff88, #00ccff)' : 
+                'linear-gradient(45deg, #666, #888)';
+            
+            // Play test sound when enabling
+            if (gameState.soundEnabled && sounds.correct) {
+                resumeAudioContext();
+                sounds.correct();
+            }
+        }
+
+        // Initialize the game
+        function initializeGame() {
+            createStarfield();
+            setupFormValidation();
+            initializeAudio();
+        }
+        
+        // Create animated starfield
+        function createStarfield() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Setup form validation
+        function setupFormValidation() {
+            const nameInput = document.getElementById('playerName');
+            const classInput = document.getElementById('playerClass');
+            const startButton = document.getElementById('startButton');
+            
+            function validateForm() {
+                const name = nameInput.value.trim();
+                const className = classInput.value.trim();
+                
+                if (name.length >= 2 && className.length >= 1) {
+                    startButton.disabled = false;
+                    startButton.textContent = '🚀 BEGIN MISSION 🚀';
+                } else {
+                    startButton.disabled = true;
+                    startButton.textContent = '🚀 ENTER NAME & CLASS FIRST 🚀';
+                }
+            }
+            
+            nameInput.addEventListener('input', validateForm);
+            classInput.addEventListener('input', validateForm);
+            validateForm();
+        }
+        
+        // Show level announcement
+        function showLevelAnnouncement(levelNumber, callback) {
+            const currentLevel = grammarLevels[levelNumber - 1];
+            if (!currentLevel) return;
+            
+            // Update announcement content
+            document.getElementById('levelAnnouncementTitle').textContent = `LEVEL ${levelNumber}`;
+            document.getElementById('levelAnnouncementName').textContent = currentLevel.name;
+            document.getElementById('levelAnnouncementDescription').textContent = currentLevel.description;
+            document.getElementById('levelTimeLimit').textContent = currentLevel.timeLimit;
+            
+            // Show announcement screen
+            document.getElementById('levelAnnouncementScreen').classList.add('show');
+            
+            // Countdown from 3
+            let countdown = 3;
+            const countdownElement = document.getElementById('levelCountdown');
+            
+            const countdownInterval = setInterval(() => {
+                countdownElement.textContent = countdown;
+                
+                countdown--;
+                
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    
+                    // Hide announcement screen
+                    document.getElementById('levelAnnouncementScreen').classList.remove('show');
+                    
+                    // Start the level
+                    if (callback) {
+                        setTimeout(callback, 500); // Small delay for smooth transition
+                    }
+                }
+            }, 1000);
+        }
+
+        // Start the game
+        function startGame() {
+            const nameInput = document.getElementById('playerName');
+            const classInput = document.getElementById('playerClass');
+            
+            gameState.playerName = nameInput.value.trim();
+            gameState.playerClass = classInput.value.trim();
+            
+            if (!gameState.playerName || !gameState.playerClass) return;
+            
+            // Resume audio context
+            resumeAudioContext();
+            
+            // Update HUD
+            document.getElementById('hudPlayerName').textContent = gameState.playerName;
+            document.getElementById('hudPlayerClass').textContent = gameState.playerClass;
+            
+            // Switch to game view
+            document.getElementById('homepage').classList.add('hidden');
+            document.getElementById('gameArea').classList.add('active');
+            
+            // Initialize game state
+            gameState.isActive = false; // Will be set to true after announcement
+            gameState.score = 0;
+            gameState.health = 100;
+            gameState.level = 1;
+            gameState.alienCount = 0;
+            gameState.timeLeft = 45;
+            gameState.levelScores = [];
+            gameState.totalCorrect = 0;
+            gameState.totalIncorrect = 0;
+            
+            // Initialize sentence pool for new game
+            initializeSentencePool();
+            
+            updateHUD();
+            
+            // Show level 1 announcement
+            showLevelAnnouncement(1, () => {
+                gameState.isActive = true;
+                
+                // Play game start sound
+                if (sounds.gameStart) {
+                    sounds.gameStart();
+                }
+                
+                startGameLoop();
+                startTimer();
+            });
+        }
+        
+        // Update HUD display
+        function updateHUD() {
+            document.getElementById('scoreDisplay').textContent = gameState.score;
+            document.getElementById('healthDisplay').textContent = gameState.health;
+            document.getElementById('timerDisplay').textContent = gameState.timeLeft;
+            
+            // Update level info
+            const currentLevel = grammarLevels[gameState.level - 1];
+            if (currentLevel) {
+                document.getElementById('levelName').textContent = currentLevel.name;
+                document.getElementById('levelDescription').textContent = currentLevel.description;
+            }
+            
+            // Add warning animation when time is low
+            const timerDisplay = document.getElementById('timerDisplay').parentElement;
+            if (gameState.timeLeft <= 10) {
+                timerDisplay.classList.add('warning');
+                // Play warning sound at 10, 5, 3, 2, 1 seconds
+                if (gameState.timeLeft <= 5 && sounds.timerWarning) {
+                    sounds.timerWarning();
+                }
+            } else {
+                timerDisplay.classList.remove('warning');
+            }
+        }
+        
+        // Get available sentences for current level
+        function getAvailableSentences() {
+            // Return sentences only for the current level
+            return grammarSentences.filter(sentence => sentence.level === gameState.level);
+        }
+        
+        // Track used sentences to prevent repetition
+        let usedSentences = [];
+        let availableSentencePool = [];
+        let timerInterval;
+        
+        // Start timer countdown
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!gameState.isActive) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+                
+                gameState.timeLeft--;
+                updateHUD();
+                
+                if (gameState.timeLeft <= 0) {
+                    levelComplete();
+                }
+            }, 1000);
+        }
+        
+        function initializeSentencePool() {
+            const levelSentences = getAvailableSentences();
+            availableSentencePool = [...levelSentences];
+            usedSentences = [];
+        }
+        
+        function getRandomSentence() {
+            // If pool is empty, refill it (excluding recently used ones)
+            if (availableSentencePool.length === 0) {
+                const allLevelSentences = getAvailableSentences();
+                // Keep last 8 sentences as "recently used" to avoid immediate repetition
+                const recentTexts = usedSentences.slice(-8).map(s => s.text);
+                availableSentencePool = allLevelSentences.filter(sentence => 
+                    !recentTexts.includes(sentence.text)
+                );
+                
+                // If still empty (very rare), use all sentences
+                if (availableSentencePool.length === 0) {
+                    availableSentencePool = [...allLevelSentences];
+                    usedSentences = [];
+                }
+            }
+            
+            // Select random sentence from pool
+            const randomIndex = Math.floor(Math.random() * availableSentencePool.length);
+            const selectedSentence = availableSentencePool[randomIndex];
+            
+            // Remove from pool and add to used
+            availableSentencePool.splice(randomIndex, 1);
+            usedSentences.push(selectedSentence);
+            
+            // Keep used sentences list manageable
+            if (usedSentences.length > 20) {
+                usedSentences = usedSentences.slice(-15);
+            }
+            
+            return selectedSentence;
+        }
+        
+        // Create an alien
+        function createAlien() {
+            if (!gameState.isActive) return;
+            
+            const alien = document.createElement('div');
+            alien.className = 'alien';
+            
+            // Get random sentence using smart selection
+            const sentence = getRandomSentence();
+            
+            // Create alien HTML
+            alien.innerHTML = `
+                <div class="alien-body">
+                    <div class="alien-antennae">
+                        <div class="antenna"></div>
+                        <div class="antenna"></div>
+                    </div>
+                    <div class="alien-eyes">
+                        <div class="alien-eye"></div>
+                        <div class="alien-eye"></div>
+                    </div>
+                    <div class="alien-mouth"></div>
+                    <div class="alien-arms">
+                        <div class="alien-arm left"></div>
+                        <div class="alien-arm right"></div>
+                    </div>
+                </div>
+                <div class="sentence-bubble">${sentence.text}</div>
+            `;
+            
+            // Position alien randomly
+            const gameArea = document.getElementById('gameArea');
+            const maxX = window.innerWidth - 120;
+            const maxY = window.innerHeight - 280;
+            
+            alien.style.left = Math.random() * maxX + 'px';
+            alien.style.top = Math.random() * maxY + 100 + 'px';
+            
+            // Add click handler
+            alien.addEventListener('click', () => shootAlien(alien, sentence.correct));
+            
+            gameArea.appendChild(alien);
+            gameState.alienCount++;
+            
+            // Play alien spawn sound
+            if (sounds.alienSpawn) {
+                sounds.alienSpawn();
+            }
+            
+            // Remove alien after 8 seconds if not clicked
+            setTimeout(() => {
+                if (alien.parentNode) {
+                    alien.remove();
+                    gameState.alienCount--;
+                }
+            }, 8000);
+        }
+        
+        // Handle alien shooting
+        function shootAlien(alien, isCorrect) {
+            if (!gameState.isActive) return;
+            
+            // Play shoot sound
+            if (sounds.shoot) {
+                sounds.shoot();
+            }
+            
+            const rect = alien.getBoundingClientRect();
+            
+            // Create explosion effect
+            const explosion = document.createElement('div');
+            explosion.className = `explosion ${isCorrect ? 'correct' : 'incorrect'}`;
+            explosion.style.position = 'fixed';
+            explosion.style.left = rect.left + rect.width/2 - 50 + 'px';
+            explosion.style.top = rect.top + rect.height/2 - 50 + 'px';
+            
+            document.body.appendChild(explosion);
+            
+            // Show feedback
+            const feedback = document.getElementById('feedback');
+            
+            if (isCorrect) {
+                gameState.score += 15;
+                gameState.totalCorrect++;
+                feedback.textContent = '+15 CORRECT!';
+                feedback.style.color = '#00ff88';
+                // Play correct sound
+                if (sounds.correct) {
+                    setTimeout(() => sounds.correct(), 100);
+                }
+            } else {
+                gameState.health -= 25;
+                gameState.totalIncorrect++;
+                feedback.textContent = '-25 WRONG!';
+                feedback.style.color = '#ff6b6b';
+                // Play wrong sound
+                if (sounds.wrong) {
+                    setTimeout(() => sounds.wrong(), 100);
+                }
+            }
+            
+            feedback.classList.add('show');
+            
+            // Clean up effects
+            setTimeout(() => {
+                feedback.classList.remove('show');
+                explosion.remove();
+            }, 1500);
+            
+            // Remove alien
+            alien.remove();
+            gameState.alienCount--;
+            
+            updateHUD();
+            
+            // Check for game over
+            if (gameState.health <= 0) {
+                endGame();
+                return;
+            }
+        }
+        
+        // Level completion
+        function levelComplete() {
+            clearInterval(timerInterval);
+            gameState.isActive = false; // Pause game during transition
+            
+            // Store level score
+            gameState.levelScores.push({
+                level: gameState.level,
+                score: gameState.score,
+                levelName: grammarLevels[gameState.level - 1].name
+            });
+            
+            // Remove all aliens
+            document.querySelectorAll('.alien').forEach(alien => alien.remove());
+            gameState.alienCount = 0;
+            
+            const feedback = document.getElementById('feedback');
+            
+            // Play level complete sound
+            if (sounds.levelComplete) {
+                sounds.levelComplete();
+            }
+            
+            // Check if this was the final level
+            if (gameState.level >= 7) {
+                // Game completed successfully
+                feedback.innerHTML = `🎉 ALL LEVELS COMPLETED! 🎉<br>GRAMMAR MASTER ACHIEVED!`;
+                feedback.style.color = '#00ff88';
+                feedback.classList.add('show');
+                
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                    endGame(true);
+                }, 5000);
+                return;
+            }
+            
+            // Move to next level
+            gameState.level++;
+            gameState.timeLeft = 45;
+            gameState.health = Math.min(100, gameState.health + 25); // Restore some health
+            
+            feedback.innerHTML = `LEVEL ${gameState.level - 1} COMPLETE!`;
+            feedback.style.color = '#00ff88';
+            feedback.classList.add('show');
+            
+            // Initialize sentence pool for new level
+            initializeSentencePool();
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+                
+                // Show next level announcement
+                showLevelAnnouncement(gameState.level, () => {
+                    gameState.isActive = true;
+                    updateHUD();
+                    startTimer();
+                    startGameLoop(); // Restart the game loop for alien spawning
+                });
+            }, 2000);
+        }
+        
+        // Game loop with optimized timing
+        let gameLoopInterval;
+        
+        function startGameLoop() {
+            clearInterval(gameLoopInterval);
+            
+            // Adjust spawn rate based on level - start slow, get faster
+            const levelSpawnRate = Math.max(800, 2000 - (gameState.level - 1) * 200);
+            
+            gameLoopInterval = setInterval(() => {
+                if (!gameState.isActive) {
+                    clearInterval(gameLoopInterval);
+                    return;
+                }
+                
+                // Spawn aliens if needed - many more aliens!
+                const maxAliens = Math.min(20, gameState.level + 8);
+                if (gameState.alienCount < maxAliens) {
+                    createAlien();
+                }
+            }, levelSpawnRate);
+        }
+        
+        // End game
+        function endGame(completed = false) {
+            gameState.isActive = false;
+            clearInterval(timerInterval);
+            clearInterval(gameLoopInterval);
+            
+            // Remove all aliens
+            document.querySelectorAll('.alien').forEach(alien => alien.remove());
+            
+            // Calculate final statistics
+            const totalAttempts = gameState.totalCorrect + gameState.totalIncorrect;
+            const accuracy = totalAttempts > 0 ? Math.round((gameState.totalCorrect / totalAttempts) * 100) : 0;
+            
+            // Show game over screen
+            document.getElementById('gameOverTitle').textContent = completed ? 'Mission Accomplished!' : 'Mission Complete!';
+            document.getElementById('finalPlayerName').textContent = gameState.playerName;
+            document.getElementById('finalPlayerClass').textContent = gameState.playerClass;
+            document.getElementById('finalScore').textContent = gameState.score;
+            document.getElementById('levelsCompleted').textContent = completed ? 7 : gameState.level - 1;
+            document.getElementById('finalAccuracy').textContent = accuracy;
+            document.getElementById('gameOverScreen').classList.add('show');
+            
+            // Play game over sound
+            if (sounds.gameOver && !completed) {
+                sounds.gameOver();
+            }
+        }
+        
+        // Go back to home screen
+        function goHome() {
+            document.getElementById('gameOverScreen').classList.remove('show');
+            document.getElementById('gameArea').classList.remove('active');
+            document.getElementById('homepage').classList.remove('hidden');
+            
+            // Reset game state
+            gameState.isActive = false;
+            clearInterval(timerInterval);
+            clearInterval(gameLoopInterval);
+            
+            // Remove all aliens
+            document.querySelectorAll('.alien').forEach(alien => alien.remove());
+            
+            // Clear form fields for new player
+            document.getElementById('playerName').value = '';
+            document.getElementById('playerClass').value = '';
+            
+            // Reset start button
+            const startButton = document.getElementById('startButton');
+            startButton.disabled = true;
+            startButton.textContent = '🚀 ENTER NAME & CLASS FIRST 🚀';
+        }
+        
+        // Restart game
+        function restartGame() {
+            document.getElementById('gameOverScreen').classList.remove('show');
+            
+            // Reset game state
+            gameState.score = 0;
+            gameState.health = 100;
+            gameState.level = 1;
+            gameState.alienCount = 0;
+            gameState.spawnRate = 2000;
+            gameState.timeLeft = 45;
+            gameState.levelScores = [];
+            gameState.totalCorrect = 0;
+            gameState.totalIncorrect = 0;
+            gameState.isActive = false; // Will be set to true after announcement
+            
+            // Initialize sentence pool for restart
+            initializeSentencePool();
+            
+            updateHUD();
+            
+            // Show level 1 announcement
+            showLevelAnnouncement(1, () => {
+                gameState.isActive = true;
+                
+                // Play game start sound
+                if (sounds.gameStart) {
+                    sounds.gameStart();
+                }
+                
+                startGameLoop();
+                startTimer();
+            });
+        }
+        
+        // Download results
+        function downloadResults() {
+            const date = new Date().toLocaleDateString();
+            const time = new Date().toLocaleTimeString();
+            const totalAttempts = gameState.totalCorrect + gameState.totalIncorrect;
+            const accuracy = totalAttempts > 0 ? Math.round((gameState.totalCorrect / totalAttempts) * 100) : 0;
+            
+            let levelDetails = '';
+            grammarLevels.forEach((level, index) => {
+                const completed = index < gameState.levelScores.length;
+                const levelScore = completed ? gameState.levelScores.find(ls => ls.level === level.level) : null;
+                levelDetails += `${completed ? '✓' : '✗'} Level ${level.level}: ${level.name}`;
+                if (levelScore) {
+                    levelDetails += ` (Score: ${levelScore.score})`;
+                }
+                levelDetails += '\n';
+            });
+            
+            const results = `
+ALIEN GRAMMAR HUNT - COMPREHENSIVE RESULTS
+==========================================
+
+STUDENT INFORMATION:
+- Name: ${gameState.playerName}
+- Class: ${gameState.playerClass}
+- Date: ${date}
+- Time: ${time}
+
+OVERALL PERFORMANCE:
+- Total Score: ${gameState.score} points
+- Levels Completed: ${gameState.levelScores.length}/7
+- Final Health: ${gameState.health}%
+- Accuracy: ${accuracy}% (${gameState.totalCorrect}/${totalAttempts})
+
+DETAILED LEVEL BREAKDOWN:
+${levelDetails}
+
+GRAMMAR FOCUS AREAS COVERED:
+${gameState.levelScores.length >= 1 ? '✓ Present Tense (Simple & Continuous)' : '✗ Present Tense - Not Completed'}
+${gameState.levelScores.length >= 2 ? '✓ Past Tense (Simple & Continuous)' : '✗ Past Tense - Not Completed'}
+${gameState.levelScores.length >= 3 ? '✓ Future Tense (All Forms)' : '✗ Future Tense - Not Completed'}
+${gameState.levelScores.length >= 4 ? '✓ Perfect Tenses (All Forms)' : '✗ Perfect Tenses - Not Completed'}
+${gameState.levelScores.length >= 5 ? '✓ Conditional Sentences' : '✗ Conditional Sentences - Not Completed'}
+${gameState.levelScores.length >= 6 ? '✓ Passive Voice' : '✗ Passive Voice - Not Completed'}
+${gameState.levelScores.length >= 7 ? '✓ Mixed Tenses (Master Level)' : '✗ Mixed Tenses - Not Completed'}
+
+SCORING SYSTEM:
+- Correct Answer: +15 points
+- Incorrect Answer: -25 health points
+- Each level: 45 seconds time limit
+- Health bonus: +25 health per level completed
+
+RECOMMENDATIONS:
+${accuracy >= 90 ? '🌟 Excellent work! You have mastered English grammar.' : 
+  accuracy >= 75 ? '👍 Good performance! Focus on areas where you made mistakes.' :
+  accuracy >= 60 ? '📚 Keep practicing! Review the grammar rules for improvement.' :
+  '💪 More practice needed. Consider reviewing basic grammar concepts.'}
+
+Generated by Alien Grammar Hunt - Educational Grammar Game
+==========================================================
+            `.trim();
+            
+            const blob = new Blob([results], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${gameState.playerName.replace(/\s+/g, '_')}_Grammar_Hunt_Results_${date.replace(/\//g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', initializeGame);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96bf9afe6263fd9a',t:'MTc1NDY2MjMxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
